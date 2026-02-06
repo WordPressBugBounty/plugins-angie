@@ -1,0 +1,203 @@
+.angie-welcome-page {
+	font-family: Roboto;
+	box-sizing: border-box;
+}
+
+.angie-welcome-layout {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0;
+	margin: 0;
+	align-items: stretch;
+	min-height: 100vh;
+}
+
+.angie-welcome-left {
+	padding: 30px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 390px;
+	margin: 0 auto;
+}
+
+.angie-welcome-left h4 {
+	color: var(--text-primary, #0C0D0E);
+	font-feature-settings: 'liga' off, 'clig' off;
+	font-family: Roboto;
+	font-size: 32px;
+	font-style: normal;
+	font-weight: 700;
+	line-height: 123.5%;
+	letter-spacing: 0.25px;
+	margin: 0 0 20px 0;
+}
+
+.angie-welcome-left p {
+	color: var(--text-primary, #0C0D0E);
+	font-feature-settings: 'liga' off, 'clig' off;
+	font-family: Roboto;
+	font-size: 16px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: 150%;
+	letter-spacing: 0.15px;
+	margin: 0 0 40px 0;
+}
+
+.angie-consent-section {
+	margin-bottom: 20px;
+}
+
+.angie-consent-checkbox {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	cursor: pointer;
+}
+
+.angie-consent-checkbox input[type="checkbox"] {
+	display: none;
+}
+
+.checkmark {
+	box-sizing: border-box;
+	width: 15px;
+	height: 15px;
+	background: #fff;
+	color: #69727D;
+	border: 2px solid #69727D;
+	border-radius: 4px;
+	position: relative;
+	flex-shrink: 0;
+	margin-top: 4px;
+}
+
+.angie-consent-checkbox input[type="checkbox"]:checked + .checkmark {
+	background: #69727D;
+}
+
+.angie-consent-checkbox input[type="checkbox"]:checked + .checkmark:after {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 15px;
+	height: 15px;
+	background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M5.83333 11.6667L1.66667 7.5L2.84167 6.325L5.83333 9.30833L12.1583 2.98333L13.3333 4.16667L5.83333 11.6667Z" fill="white"/></svg>');
+	background-size: contain;
+	background-repeat: no-repeat;
+}
+
+.consent-text {
+	color: var(--text-primary, #0C0D0E);
+	font-feature-settings: 'liga' off, 'clig' off;
+	font-family: Roboto;
+	font-size: 16px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: 150%;
+	letter-spacing: 0.15px;
+}
+
+.consent-text a {
+	color: #2563EB;
+	text-decoration: none;
+}
+
+.consent-text a:hover {
+	text-decoration: underline;
+}
+
+.angie-signin-button {
+	font-family: Roboto;
+	font-size: 16px;
+	font-style: normal;
+	font-weight: 500;
+	line-height: 26px;
+	letter-spacing: 0.46px;
+	border-radius: 4px;
+	background: var(--primary-main, #F0ABFC);
+	color: black;
+	border: none;
+	padding: 8px 22px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	align-self: flex-start;
+}
+
+.angie-signin-button:hover:not(:disabled) {
+	background-color: #EB8EFB;
+}
+
+.angie-signin-button:disabled {
+	background: #e5e7eb;
+	color: #9ca3af;
+	cursor: not-allowed;
+}
+
+.angie-signin-button.loading {
+	background: #e5e7eb;
+	color: #9ca3af;
+	cursor: not-allowed;
+}
+
+.angie-welcome-right {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	padding: 30px;
+	box-sizing: border-box;
+}
+
+.angie-right-container {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	min-width: 500px;
+	min-height: 500px;
+	background-image: url('../assets/gradient.png');
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	border-radius: 16px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.angie-ask-image {
+	max-width: 80%;
+	max-height: 80%;
+	width: auto;
+	height: auto;
+	object-fit: contain;
+	z-index: 1;
+}
+
+@media (max-width: 880px) {
+	.angie-welcome-layout {
+		gap: 0;
+		margin: 0;
+		align-items: stretch;
+		grid-template-columns: 1fr;
+	}
+
+	.angie-welcome-left {
+		align-items: stretch;
+		text-align: left;
+	}
+	
+	.angie-welcome-right {
+		display: none;
+	}
+}
+
+@media (max-width: 480px) {
+	.angie-welcome-page {
+		padding: 20px;
+	}
+}
