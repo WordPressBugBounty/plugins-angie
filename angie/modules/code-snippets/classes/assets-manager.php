@@ -11,36 +11,6 @@ class Assets_Manager {
 
 	public static function init() {
 		add_action( 'admin_enqueue_scripts', [ __CLASS__, 'enqueue_code_editor_assets' ] );
-		add_action( 'admin_enqueue_scripts', [ __CLASS__, 'enqueue_dev_mode_assets' ] );
-	}
-
-	public static function enqueue_dev_mode_assets() {
-		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-		if ( ! $screen || 'edit-' . Module::CPT_NAME !== $screen->id ) {
-			return;
-		}
-
-		if ( ! Module::current_user_can_manage_snippets() ) {
-			return;
-		}
-
-		$script_url = plugins_url( 'assets/js/dev-mode.js', dirname( __FILE__ ) );
-		wp_enqueue_script(
-			'angie-dev-mode',
-			$script_url,
-			[ 'jquery' ],
-			'1.0.0',
-			true
-		);
-
-		wp_localize_script(
-			'angie-dev-mode',
-			'angieDevMode',
-			[
-				'restUrl' => esc_url( rest_url( 'angie/v1/dev-mode' ) ),
-				'nonce'   => wp_create_nonce( 'wp_rest' ),
-			]
-		);
 	}
 
 	public static function enqueue_code_editor_assets() {

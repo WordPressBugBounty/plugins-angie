@@ -19,9 +19,21 @@ class Rest_Api_Controller {
 			'/snippets',
 			[
 				[
-					'methods'             => \WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'list_snippets' ],
+					'methods' => \WP_REST_Server::READABLE,
+					'callback' => [ $this, 'list_snippets' ],
 					'permission_callback' => [ $this, 'check_permission' ],
+					'args'                => [
+						'type' => [
+							'required'          => false,
+							'type'              => 'string',
+							'sanitize_callback' => 'sanitize_text_field',
+						],
+						'deployment_status' => [
+							'required'          => false,
+							'type'              => 'string',
+							'sanitize_callback' => 'sanitize_text_field',
+						],
+					],
 				],
 			]
 		);
@@ -31,25 +43,25 @@ class Rest_Api_Controller {
 			'/snippets/(?P<slug>[a-zA-Z0-9_-]+)',
 			[
 				[
-					'methods'             => \WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'get_snippet' ],
+					'methods' => \WP_REST_Server::READABLE,
+					'callback' => [ $this, 'get_snippet' ],
 					'permission_callback' => [ $this, 'check_permission' ],
-					'args'                => [
+					'args' => [
 						'slug' => [
-							'required'          => true,
-							'type'              => 'string',
+							'required' => true,
+							'type' => 'string',
 							'sanitize_callback' => 'sanitize_text_field',
 						],
 					],
 				],
 				[
-					'methods'             => \WP_REST_Server::DELETABLE,
-					'callback'            => [ $this, 'delete_snippet' ],
+					'methods' => \WP_REST_Server::DELETABLE,
+					'callback' => [ $this, 'delete_snippet' ],
 					'permission_callback' => [ $this, 'check_permission' ],
-					'args'                => [
+					'args' => [
 						'slug' => [
-							'required'          => true,
-							'type'              => 'string',
+							'required' => true,
+							'type' => 'string',
 							'sanitize_callback' => 'sanitize_text_field',
 						],
 					],
@@ -62,39 +74,39 @@ class Rest_Api_Controller {
 			'/snippets/(?P<slug>[a-zA-Z0-9_-]+)/files',
 			[
 				[
-					'methods'             => \WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'list_snippet_files' ],
+					'methods' => \WP_REST_Server::READABLE,
+					'callback' => [ $this, 'list_snippet_files' ],
 					'permission_callback' => [ $this, 'check_permission' ],
-					'args'                => [
+					'args' => [
 						'slug' => [
-							'required'          => true,
-							'type'              => 'string',
+							'required' => true,
+							'type' => 'string',
 							'sanitize_callback' => 'sanitize_text_field',
 						],
 					],
 				],
 				[
-					'methods'             => \WP_REST_Server::CREATABLE,
-					'callback'            => [ $this, 'upsert_snippet_files' ],
+					'methods' => \WP_REST_Server::CREATABLE,
+					'callback' => [ $this, 'upsert_snippet_files' ],
 					'permission_callback' => [ $this, 'check_permission' ],
-					'args'                => [
-						'slug'      => [
-							'required'          => true,
-							'type'              => 'string',
+					'args' => [
+						'slug' => [
+							'required' => true,
+							'type' => 'string',
 							'sanitize_callback' => 'sanitize_text_field',
 						],
-						'files'     => [
+						'files' => [
 							'required' => true,
-							'type'     => 'array',
+							'type' => 'array',
 						],
 						'overwrite' => [
 							'required' => false,
-							'type'     => 'boolean',
-							'default'  => false,
+							'type' => 'boolean',
+							'default' => false,
 						],
-						'type'      => [
-							'required'          => false,
-							'type'              => 'string',
+						'type' => [
+							'required' => false,
+							'type' => 'string',
 							'sanitize_callback' => 'sanitize_text_field',
 						],
 					],
@@ -107,18 +119,18 @@ class Rest_Api_Controller {
 			'/snippets/(?P<slug>[a-zA-Z0-9_-]+)/files/(?P<filename>.+)',
 			[
 				[
-					'methods'             => \WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'get_snippet_file' ],
+					'methods' => \WP_REST_Server::READABLE,
+					'callback' => [ $this, 'get_snippet_file' ],
 					'permission_callback' => [ $this, 'check_permission' ],
-					'args'                => [
-						'slug'     => [
-							'required'          => true,
-							'type'              => 'string',
+					'args' => [
+						'slug' => [
+							'required' => true,
+							'type' => 'string',
 							'sanitize_callback' => 'sanitize_text_field',
 						],
 						'filename' => [
-							'required'          => true,
-							'type'              => 'string',
+							'required' => true,
+							'type' => 'string',
 							'sanitize_callback' => 'sanitize_text_field',
 						],
 					],
@@ -131,13 +143,13 @@ class Rest_Api_Controller {
 			'/dev-mode',
 			[
 				[
-					'methods'             => \WP_REST_Server::CREATABLE,
-					'callback'            => [ $this, 'set_dev_mode' ],
+					'methods' => \WP_REST_Server::CREATABLE,
+					'callback' => [ $this, 'set_dev_mode' ],
 					'permission_callback' => [ $this, 'check_permission' ],
-					'args'                => [
+					'args' => [
 						'enabled' => [
-							'required'          => true,
-							'type'              => 'boolean',
+							'required' => true,
+							'type' => 'boolean',
 							'sanitize_callback' => 'rest_sanitize_boolean',
 						],
 					],
@@ -150,13 +162,13 @@ class Rest_Api_Controller {
 		'/snippets/(?P<slug>[a-zA-Z0-9_-]+)/publish',
 		[
 			[
-				'methods'             => \WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'publish_snippet' ],
+				'methods' => \WP_REST_Server::CREATABLE,
+				'callback' => [ $this, 'publish_snippet' ],
 				'permission_callback' => [ $this, 'check_permission' ],
-				'args'                => [
+				'args' => [
 					'slug' => [
-						'required'          => true,
-						'type'              => 'string',
+						'required' => true,
+						'type' => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 					],
 				],
@@ -169,13 +181,13 @@ class Rest_Api_Controller {
 			'/snippets/validate',
 			[
 				[
-					'methods'             => \WP_REST_Server::CREATABLE,
-					'callback'            => [ $this, 'validate_snippet' ],
+					'methods' => \WP_REST_Server::CREATABLE,
+					'callback' => [ $this, 'validate_snippet' ],
 					'permission_callback' => [ $this, 'check_permission' ],
-					'args'                => [
+					'args' => [
 						'files' => [
 							'required' => true,
-							'type'     => 'array',
+							'type' => 'array',
 						],
 					],
 				],
@@ -186,8 +198,8 @@ class Rest_Api_Controller {
 			'/dev-mode/status',
 			[
 				[
-					'methods'             => \WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'is_dev_mode' ],
+					'methods' => \WP_REST_Server::READABLE,
+					'callback' => [ $this, 'is_dev_mode' ],
 					'permission_callback' => [ $this, 'check_permission' ],
 				],
 			]
@@ -199,11 +211,21 @@ class Rest_Api_Controller {
 	}
 
 	public function list_snippets( $request ) {
-		$posts = Snippet_Repository::get_all_snippets();
+		$type = $request->get_param( 'type' );
+		$deployment_status_param = $request->get_param( 'deployment_status' );
+		$deployment_statuses = $deployment_status_param ? array_map( 'trim', explode( ',', $deployment_status_param ) ) : [];
+
+		$posts = Snippet_Repository::get_all_snippets( $type );
 
 		$snippets = [];
 		foreach ( $posts as $post ) {
-			$snippets[] = Snippet_Repository::get_snippet_data( $post );
+			$snippet_data = Snippet_Repository::get_snippet_data( $post );
+
+			if ( ! empty( $deployment_statuses ) && ! in_array( $snippet_data['deploymentStatus'], $deployment_statuses, true ) ) {
+				continue;
+			}
+
+			$snippets[] = $snippet_data;
 		}
 
 		return rest_ensure_response( [
@@ -248,9 +270,9 @@ class Rest_Api_Controller {
 	}
 
 	public function get_snippet_file( $request ) {
-		$slug     = $request->get_param( 'slug' );
+		$slug = $request->get_param( 'slug' );
 		$filename = $request->get_param( 'filename' );
-		$post     = Snippet_Repository::find_snippet_post_by_slug( $slug );
+		$post = Snippet_Repository::find_snippet_post_by_slug( $slug );
 
 		if ( ! $post ) {
 			return new \WP_Error(
@@ -277,17 +299,17 @@ class Rest_Api_Controller {
 		}
 
 		return rest_ensure_response( [
-			'name'    => $file['name'],
+			'name' => $file['name'],
 			'content' => $content,
-			'size'    => strlen( $content ),
+			'size' => strlen( $content ),
 		] );
 	}
 
 	public function upsert_snippet_files( $request ) {
-		$slug      = $request->get_param( 'slug' );
-		$files     = $request->get_param( 'files' );
+		$slug = $request->get_param( 'slug' );
+		$files = $request->get_param( 'files' );
 		$overwrite = $request->get_param( 'overwrite' );
-		$type      = $request->get_param( 'type' );
+		$type = $request->get_param( 'type' );
 
 		if ( ! is_array( $files ) || empty( $files ) ) {
 			return new \WP_Error(
@@ -416,9 +438,11 @@ class Rest_Api_Controller {
 
 			return rest_ensure_response( [
 				'success' => true,
+				'created' => true,
 				'message' => esc_html__( 'Snippet created successfully.', 'angie' ),
-				'slug'    => $slug,
-				'files'   => count( $sanitized_files ),
+				'slug' => $slug,
+				'post_id' => $post_id,
+				'files' => count( $sanitized_files ),
 			] );
 		}
 
@@ -451,9 +475,11 @@ class Rest_Api_Controller {
 
 		return rest_ensure_response( [
 			'success' => true,
+			'created' => false,
 			'message' => esc_html__( 'Snippet files updated successfully.', 'angie' ),
-			'slug'    => $slug,
-			'files'   => count( $merged_files ),
+			'slug' => $slug,
+			'post_id' => $post->ID,
+			'files' => count( $merged_files ),
 		] );
 	}
 
@@ -469,91 +495,91 @@ class Rest_Api_Controller {
 			);
 		}
 
- 	$environments = [ Dev_Mode_Manager::ENV_DEV, Dev_Mode_Manager::ENV_PROD ];
- 	File_System_Handler::delete_snippet_files( $post->ID, $environments );
+		$environments = [ Dev_Mode_Manager::ENV_DEV, Dev_Mode_Manager::ENV_PROD ];
+		File_System_Handler::delete_snippet_files( $post->ID, $environments );
 
- 	$result = Snippet_Repository::delete_snippet( $post->ID );
+		$result = Snippet_Repository::delete_snippet( $post->ID );
 
- 	if ( ! $result ) {
- 		return new \WP_Error(
- 			'delete_failed',
- 			esc_html__( 'Failed to delete snippet.', 'angie' ),
- 			[ 'status' => 500 ]
- 		);
- 	}
+		if ( ! $result ) {
+			return new \WP_Error(
+				'delete_failed',
+				esc_html__( 'Failed to delete snippet.', 'angie' ),
+				[ 'status' => 500 ]
+			);
+		}
 
- 	Cache_Manager::clear_published_snippet_cache();
+		Cache_Manager::clear_published_snippet_cache();
 
- 	return rest_ensure_response( [
- 		'success' => true,
- 		'message' => esc_html__( 'Snippet deleted successfully.', 'angie' ),
- 		'slug'    => $slug,
- 	] );
-  }
+		return rest_ensure_response( [
+			'success' => true,
+			'message' => esc_html__( 'Snippet deleted successfully.', 'angie' ),
+			'slug' => $slug,
+		] );
+	}
 
- 	public function set_dev_mode( $request ) {
- 		$enabled = $request->get_param( 'enabled' );
+	public function set_dev_mode( $request ) {
+		$enabled = $request->get_param( 'enabled' );
 
- 		if ( $enabled ) {
- 			$session = Dev_Mode_Manager::create_dev_mode_session();
+		if ( $enabled ) {
+			$session = Dev_Mode_Manager::create_dev_mode_session();
 
- 			if ( ! $session ) {
- 				return new \WP_Error(
- 					'session_creation_failed',
- 					esc_html__( 'Failed to create dev mode session. User must be logged in.', 'angie' ),
- 					[ 'status' => 403 ]
- 				);
- 			}
+			if ( ! $session ) {
+				return new \WP_Error( 'session_creation_failed',
+					esc_html__( 'Failed to create test mode session. User must be logged in.', 'angie' ),
+					[ 'status' => 403 ]
+				);
+			}
 
- 			return rest_ensure_response( [
- 				'success' => true,
- 				'message' => esc_html__( 'Dev mode enabled for 1 hour.', 'angie' ),
- 				'enabled' => true,
- 				'expiry'  => $session['expiry'],
- 			] );
- 		} else {
- 			Dev_Mode_Manager::clear_dev_mode_session();
+			return rest_ensure_response( [
+				'success' => true,
+				'message' => esc_html__( 'Test mode enabled.', 'angie' ),
+				'enabled' => true,
+				'expiry'  => $session['expiry'],
+			] );
+		} else {
+			Dev_Mode_Manager::clear_dev_mode_session();
 
- 			return rest_ensure_response( [
- 				'success' => true,
- 				'message' => esc_html__( 'Dev mode disabled.', 'angie' ),
- 				'enabled' => false,
- 			] );
- 		}
- 	}
+			return rest_ensure_response( [
+				'success' => true,
+				'message' => esc_html__( 'Test mode disabled.', 'angie' ),
+				'enabled' => false,
+			] );
+		}
+	}
 
- 	public function publish_snippet( $request ) {
- 		$slug = $request->get_param( 'slug' );
- 		$post = Snippet_Repository::find_snippet_post_by_slug( $slug );
+	public function publish_snippet( $request ) {
+		$slug = $request->get_param( 'slug' );
+		$post = Snippet_Repository::find_snippet_post_by_slug( $slug );
 
- 		if ( ! $post ) {
- 			return new \WP_Error(
- 				'snippet_not_found',
- 				esc_html__( 'Snippet not found.', 'angie' ),
- 				[ 'status' => 404 ]
- 			);
- 		}
+		if ( ! $post ) {
+			return new \WP_Error(
+				'snippet_not_found',
+				esc_html__( 'Snippet not found.', 'angie' ),
+				[ 'status' => 404 ]
+			);
+		}
 
- 		$files = Snippet_Repository::get_snippet_files( $post->ID );
+		$files = Snippet_Repository::get_snippet_files( $post->ID );
 
- 		if ( empty( $files ) ) {
- 			return new \WP_Error(
- 				'no_files',
- 				esc_html__( 'Snippet has no files to publish.', 'angie' ),
- 				[ 'status' => 400 ]
- 			);
- 		}
+		if ( empty( $files ) ) {
+			return new \WP_Error(
+				'no_files',
+				esc_html__( 'Snippet has no files to publish.', 'angie' ),
+				[ 'status' => 400 ]
+			);
+		}
 
- 		File_System_Handler::write_snippet_files_to_disk( Dev_Mode_Manager::ENV_PROD, $post->ID, $files );
- 		Cache_Manager::clear_published_snippet_cache();
+		File_System_Handler::write_snippet_files_to_disk( Dev_Mode_Manager::ENV_PROD, $post->ID, $files );
+		Cache_Manager::clear_published_snippet_cache();
 
- 		return rest_ensure_response( [
- 			'success' => true,
- 			'message' => esc_html__( 'Snippet published to production successfully.', 'angie' ),
- 			'slug'    => $slug,
- 			'files'   => count( $files ),
- 		] );
- 	}
+		return rest_ensure_response( [
+			'success' => true,
+			'message' => esc_html__( 'Snippet published to production successfully.', 'angie' ),
+			'slug' => $slug,
+			'post_id' => $post->ID,
+			'files' => count( $files ),
+		] );
+	}
 
 	public function validate_snippet( $request ) {
 		$files = $request->get_param( 'files' );

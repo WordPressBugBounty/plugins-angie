@@ -34,8 +34,6 @@ class Files_Meta_Box {
 
 		wp_nonce_field( 'angie_snippet_files_save', 'angie_snippet_files_nonce' );
 
-		self::enqueue_files_meta_box_script();
-
 		echo '<div id="angie-snippet-files">';
 		echo '<p>' . esc_html__( 'Add one or more files to this snippet. Each file has a filename and its content.', 'angie' ) . '</p>';
 		echo '<table class="widefat fixed striped">';
@@ -77,31 +75,6 @@ class Files_Meta_Box {
 		echo '</div>';
 	}
 
-	private static function enqueue_files_meta_box_script() {
-		$script_url = plugins_url( 'assets/js/files-meta-box.js', dirname( __FILE__ ) );
-		wp_enqueue_script(
-			'angie-files-meta-box',
-			$script_url,
-			[ 'code-editor' ],
-			'1.0.0',
-			true
-		);
-
-		wp_localize_script(
-			'angie-files-meta-box',
-			'angieFilesMetaBox',
-			[
-				'placeholders' => [
-					'name'    => esc_attr__( 'e.g. main.php', 'angie' ),
-					'content' => esc_attr__( 'File content…', 'angie' ),
-				],
-				'labels'       => [
-					'remove' => esc_html__( 'Remove', 'angie' ),
-				],
-			]
-		);
-	}
-
 	public static function save_files_meta( $post_id ) {
 		if ( ! isset( $_POST['angie_snippet_files_nonce'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			return;
@@ -130,9 +103,9 @@ class Files_Meta_Box {
 		$files     = [];
 
 		foreach ( $raw_files as $file ) {
-			$name = isset( $file['name'] ) ? sanitize_text_field( wp_unslash( $file['name'] ) ) : '';
-			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Unslashing to remove WP magic quotes; base64 encoded immediately.
-			$content_clean = isset( $file['content'] ) ? wp_unslash( $file['content'] ) : '';
+			$name = isset( $file['name'] ) ? sanitize_text_field( $file['name'] ) : '';
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Already unslashed via $raw_files; base64 encoded immediately.
+			$content_clean = isset( $file['content'] ) ? $file['content'] : '';
 
 			if ( '' === trim( $name ) && '' === trim( $content_clean ) ) {
 				continue;

@@ -63,7 +63,17 @@ class File_System_Handler {
 
 			$file_path = $base_dir . '/' . $filename;
 			$wp_filesystem->put_contents( $file_path, $content, FS_CHMOD_FILE );
+
+			self::maybe_invalidate_opcache( $file_path );
 		}
+	}
+
+	private static function maybe_invalidate_opcache( $filepath ) {
+		if ( ! function_exists( 'wp_opcache_invalidate' ) ) {
+			return;
+		}
+
+		wp_opcache_invalidate( $filepath, true );
 	}
 
 	public static function delete_snippet_files( $post_id, $environments ) {

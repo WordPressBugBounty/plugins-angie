@@ -3,7 +3,7 @@
  * Plugin Name: Angie
  * Description: Agentic AI for WordPress
  * Plugin URI: https://elementor.com/pages/angie-early-access
- * Version: 1.0.4
+ * Version: 1.1.0
  * Author: Elementor.com
  * Author URI: https://elementor.com/
  * Text Domain: angie
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'ANGIE_VERSION', '1.0.4' );
+define( 'ANGIE_VERSION', '1.1.0' );
 define( 'ANGIE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ANGIE_URL', plugins_url( '/', __FILE__ ) );
 define( 'ANGIE_ASSETS_PATH', ANGIE_PATH . 'assets/' );

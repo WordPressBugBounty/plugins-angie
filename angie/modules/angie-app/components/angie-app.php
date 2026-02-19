@@ -4,7 +4,6 @@ namespace Angie\Modules\AngieApp\Components;
 
 use Angie\Modules\ConsentManager\Module as ConsentManager;
 use Angie\Modules\ConsentManager\Components\Consent_Page;
-use Angie\Modules\CodeSnippets\Module as CodeSnippets;
 use Angie\Includes\Utils;
 
 
@@ -155,7 +154,7 @@ class Angie_App {
 
 		wp_add_inline_script(
 			'angie-app',
-			'window.angieConfig = ' . wp_json_encode( [
+			'window.angieConfig = ' . wp_json_encode( apply_filters( 'angie_config', [
 				'plugins' => $plugins,
 				'installedPlugins' => $installed_plugins,
 				'postTypesNames' => $post_types_names,
@@ -164,9 +163,8 @@ class Angie_App {
 				'wpUsername' => $wp_username,
 				'untrusted__wpUserRole' => $wp_user_role, // Used only for analytics - Never use for auth decisions
 				'siteKey' => $this->get_site_key(),
-				'codeSnippetsActive' => CodeSnippets::is_active(),
 				'isElementorOneConnected' => $this->is_elementor_one_connected(),
-			] ),
+			] ) ),
 			'before'
 		);
 	}
@@ -276,89 +274,6 @@ class Angie_App {
 
 			<?php $this->render_app_styles(); ?>
 
-		<script>
-			(function() {
-				// Listen for messages from iframe about authentication status
-				window.addEventListener('message', function(event) {
-					// Check if message is from iframe about user being already authenticated
-					if (event.data && event.data.type === 'ANGIE_USER_ALREADY_AUTHENTICATED') {
-						console.log('User already authenticated');
-						// Open sidebar after a short delay
-						setTimeout(() => {
-							if (typeof window.toggleAngieSidebar === 'function') {
-								window.toggleAngieSidebar(true);
-							}
-						}, 500);
-					}
-				});
-
-					<?php if ( $is_in_oauth_flow ) : ?>
-					const isStarting = <?php echo json_encode( $is_oauth_starting ); ?>;
-					const isReturning = <?php echo json_encode( $is_oauth_return ); ?>;
-
-					function ensureSidebarClosed() {
-						if (typeof window.toggleAngieSidebar === 'function') {
-							window.toggleAngieSidebar(false, true);
-						}
-					}
-
-					function isOAuthComplete() {
-						const urlParams = new URLSearchParams(window.location.search);
-						return !urlParams.has('oauth_code') && !urlParams.has('oauth_state') && !urlParams.has('start-oauth');
-					}
-
-					function updateUIAfterAuth() {
-						const appStart = document.getElementById('angie-app-start');
-						if (appStart) {
-							// Remove loading state if it exists
-							const loadingState = appStart.querySelector('.angie-loading-state');
-							if (loadingState) {
-								loadingState.remove();
-							}
-						}
-					}
-
-					function openSidebarAfterAuth() {
-						try {
-							localStorage.setItem('angie_sidebar_state', 'open');
-						} catch (e) {}
-						if (typeof window.toggleAngieSidebar === 'function') {
-							setTimeout(() => window.toggleAngieSidebar(true), 500);
-						}
-					}
-
-					function monitorAuthCompletion() {
-						let authenticationSuccessful = false;
-						const checkInterval = setInterval(function() {
-							const sidebar = document.getElementById('angie-sidebar-container');
-							if (sidebar?.querySelector('iframe') && isOAuthComplete()) {
-								updateUIAfterAuth();
-								clearInterval(checkInterval);
-								authenticationSuccessful = true;
-								openSidebarAfterAuth();
-								window.location.reload(); // Reload to update MCPs
-							}
-						}, 500);
-
-						setTimeout(function() {
-							clearInterval(checkInterval);
-							if (!authenticationSuccessful) {
-								console.log('OAuth authentication timed out');
-								ensureSidebarClosed();
-							}
-						}, 30000);
-					}
-
-					ensureSidebarClosed();
-
-					if (isStarting && !isReturning) {
-						console.log('OAuth flow starting, waiting for redirect...');
-					} else if (isReturning) {
-						monitorAuthCompletion();
-					}
-					<?php endif; ?>
-				})();
-			</script>
 		<?php else : ?>
 			<div class="wrap">
 				<div class="angie-consent-required">

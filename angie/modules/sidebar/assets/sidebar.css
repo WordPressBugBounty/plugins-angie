@@ -17,50 +17,35 @@ body.angie-sidebar-transitioning #wpadminbar {
 @media (min-width: 768px) {
     body.angie-sidebar-active #angie-body-top-padding {
         width: 100%;
-        height: 8px;
+        height: 0;
     }
 
     /* Push WordPress Admin Bar - LTR */
     body.angie-sidebar-active #wpadminbar {
         inset-inline-start: var(--angie-sidebar-width) !important;
-        inset-inline-end: 8px !important;
-        width: calc(100% - 8px - var(--angie-sidebar-width)) !important;
-        margin-top: 8px;
+        inset-inline-end: 0 !important;
+        width: calc(100% - var(--angie-sidebar-width)) !important;
+        margin-top: 0;
     }
 
     body.angie-sidebar-active #wpfooter {
-        bottom: 8px !important;
+        bottom: 0 !important;
     }
 
     body.angie-sidebar-active #adminmenuback {
-        top: 8px !important;
+        top: 0 !important;
     }
 
     html.angie-sidebar-active {
-        margin-inline-end: 8px !important;
+        margin-inline-end: 0 !important;
     }
 
     body.angie-sidebar-active #adminmenuwrap {
-        margin-bottom: 8px;
+        margin-bottom: 0;
     }
-
-    body.angie-sidebar-active #angie-wrapper {
-        --angie-wrapper-border-width: 1px;
-        position: fixed;
-        top: 8px;
-        inset-inline-start: var(--angie-sidebar-width);
-        width: calc(100% - 7px - (var(--angie-wrapper-border-width) * 2) - var(--angie-sidebar-width));
-        height: calc(100% - 17px);
-        z-index: var(--angie-sidebar-z-index) !important;
-        border: var(--angie-wrapper-border-width) solid var(--action-selected, rgba(0, 0, 0, 0.08));
-        border-radius: 8px;
-        box-shadow: 0 0 0 100vmax #FCFCFC;
-        pointer-events: none;
-    }
-
 
     body.angie-sidebar-active .woocommerce-layout__header{
-        margin-top: 8px;
+        margin-top: 0;
     }
 
     body.angie-sidebar-active #image-optimization-top-bar > div {
@@ -98,12 +83,12 @@ body.is-fullscreen-mode {
 body.block-editor-page.angie-sidebar-active.block-editor-page .interface-interface-skeleton {
     inset-inline-start: calc(var(--angie-sidebar-width) + var(--admin-menu-width)) !important;
     inset-inline-end: 0 !important;
-    top: calc(32px + 8px) !important;
-    margin-bottom: 8px !important;
+    top: 32px !important;
+    margin-bottom: 0 !important;
 }
 
 .block-editor-page.angie-sidebar-active.block-editor-page.is-fullscreen-mode .interface-interface-skeleton {
-    top: 8px !important;
+    top: 0 !important;
 }
 
 /* Ensure interface skeleton transitions smoothly */

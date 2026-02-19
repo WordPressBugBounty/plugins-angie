@@ -90,6 +90,19 @@ class Plugin {
 			$autoloader_registered = spl_autoload_register( [ $this, 'autoload' ] );
 		}
 		$this->init();
+		$this->register_heartbeat_nonce_refresh();
+	}
+
+	private function register_heartbeat_nonce_refresh() {
+		add_filter( 'heartbeat_received', [ $this, 'refresh_angie_nonce_on_heartbeat' ], 10, 2 );
+	}
+
+	public function refresh_angie_nonce_on_heartbeat( array $response, array $data ): array {
+		if ( ! is_user_logged_in() ) {
+			return $response;
+		}
+		$response['angie_nonce'] = wp_create_nonce( 'wp_rest' );
+		return $response;
 	}
 }
 // Instantiate Plugin Class.

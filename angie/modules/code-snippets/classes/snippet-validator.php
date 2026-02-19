@@ -44,8 +44,9 @@ class Snippet_Validator {
 			];
 		}
 
+		$validate_url = self::get_loopback_url( 'angie/v1/snippets/validate' );
 		$response = wp_remote_post(
-			rest_url( 'angie/v1/snippets/validate' ),
+			$validate_url,
 			[
 				'headers' => [
 					'Content-Type' => 'application/json',
@@ -78,7 +79,11 @@ class Snippet_Validator {
 		$validation_result = json_decode( $response_body, true );
 
 		if ( \WP_Http::OK !== $response_code || ! isset( $validation_result['valid'] ) || ! $validation_result['valid'] ) {
-			$error_message = isset( $validation_result['message'] ) ? $validation_result['message'] : esc_html__( 'Unknown validation error.', 'angie' );
+			$error_message = $validation_result['data']['error']['message']
+				?? $validation_result['data']['details']['message']
+				?? $validation_result['message']
+				?? esc_html__( 'Unknown validation error.', 'angie' );
+
 			return new \WP_Error(
 				'validation_failed',
 				sprintf(
@@ -143,6 +148,7 @@ class Snippet_Validator {
 		} );
 
 		try {
+
 			include $file_path;
 
 			$output = ob_get_clean();
@@ -180,6 +186,19 @@ class Snippet_Validator {
 				],
 			];
 		}
+	}
+
+	// This loopback url is used to validate the snippet in the local environment (wp-env)
+	private static function get_loopback_url( $rest_route ) {
+		$url = rest_url( $rest_route );
+
+		$host = wp_parse_url( $url, PHP_URL_HOST );
+
+		if ( 'localhost' !== $host && '127.0.0.1' !== $host ) {
+			return $url;
+		}
+
+		return str_replace( $host, 'host.docker.internal', $url );
 	}
 
 	private static function create_temp_snippet_dir() {

@@ -40,15 +40,59 @@ class Module extends Module_Base {
 	protected function __construct() {
 		$this->init_rest_controllers();
 		add_action( 'elementor/editor/after_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+		add_action( 'elementor/elements/categories_registered', [ $this, 'register_widget_categories' ] );
+		add_action( 'elementor/editor/templates/panel/category', [ $this, 'render_angie_category_generate_button' ] );
+		add_action( 'elementor/editor/templates/panel/category/content', [ $this, 'render_angie_category_empty_state' ] );
 		add_filter( 'angie_mcp_plugins', function ( $plugins ) {
 			$plugins['elementor'] = [];
 			return $plugins;
 		} );
 	}
 
-	/**
-	 * Initialize controllers
-	 */
+	public function register_widget_categories( $elements_manager ) {
+		$elements_manager->add_category(
+			'angie-widgets',
+			[
+				'title' => esc_html__( 'Angie Widgets', 'angie' ),
+				'icon' => 'eicon-ai',
+				'hideIfEmpty' => false,
+				'active' => true,
+			]
+		);
+	}
+
+	public function render_angie_category_generate_button() {
+		?><# if ( 'angie-widgets' === name ) { #>
+		<span class="angie-category-generate" data-angie-generate-widget style="display: inline-flex; align-items: center; gap: 4px; margin-inline-start: auto; color: #C00BB9; color: light-dark(#C00BB9, #F0ABFC); font-size: 12px; font-weight: 500; cursor: pointer;">
+			<i class="eicon-ai" aria-hidden="true" style="font-size: 14px;"></i>
+			<?php echo esc_html__( 'Generate', 'angie' ); ?>
+		</span>
+		<# } #><?php
+	}
+
+	public function render_angie_category_empty_state() {
+		if ( $this->has_angie_widgets() ) {
+			return;
+		}
+		?><# if ( 'angie-widgets' === name ) { #>
+		<div class="angie-category-empty-state" data-angie-category-empty-state style="grid-column: 1 / -1; width: 100%; padding: 12px 20px;">
+			<p style="color: #A4AFB7; font-size: 12px; margin: 0; line-height: 1.4;"><?php echo esc_html__( 'Your generated widgets by Angie will show up here.', 'angie' ); ?></p>
+		</div>
+		<# } #><?php
+	}
+
+	private function has_angie_widgets(): bool {
+		$widgets = \Elementor\Plugin::$instance->widgets_manager->get_widget_types();
+
+		foreach ( $widgets as $widget ) {
+			if ( in_array( 'angie-widgets', $widget->get_categories(), true ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	private function init_rest_controllers() {
 		$this->kit_provider = new Kit_Provider();
 	}

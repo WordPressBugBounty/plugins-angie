@@ -35,6 +35,7 @@ class Module extends Module_Base {
 		$this->init_components();
 
 		add_action( 'rest_api_init', [ $this, 'register_rest_routes' ] );
+		add_action( 'wp_logout', [ Dev_Mode_Manager::class, 'clear_dev_mode_session' ] );
 
 		if ( $this->should_load_snippets() ) {
 			Dev_Mode_Manager::load_snippets();
@@ -78,6 +79,8 @@ class Module extends Module_Base {
 	}
 
 	private function init_components() {
+		require_once __DIR__ . '/utils.php';
+
 		Post_Type_Manager::init();
 		Taxonomy_Manager::init();
 		Assets_Manager::init();
@@ -95,7 +98,7 @@ class Module extends Module_Base {
 	}
 
 	public static function is_active(): bool {
-		return defined( 'ANGIE_CODE_SNIPPETS_ACTIVE' ) && ANGIE_CODE_SNIPPETS_ACTIVE;
+		return true;
 	}
 
 	public static function current_user_can_manage_snippets(): bool {

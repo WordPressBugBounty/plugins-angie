@@ -13,8 +13,18 @@ class List_Table_Manager {
 		add_filter( 'manage_' . Module::CPT_NAME . '_posts_columns', [ __CLASS__, 'add_custom_columns' ] );
 		add_action( 'manage_' . Module::CPT_NAME . '_posts_custom_column', [ __CLASS__, 'render_custom_columns' ], 10, 2 );
 		add_action( 'admin_enqueue_scripts', [ __CLASS__, 'enqueue_assets' ] );
+		add_filter( 'angie_config', [ __CLASS__, 'add_config' ] );
 		add_action( 'wp_ajax_angie_toggle_snippet_status', [ __CLASS__, 'ajax_toggle_status' ] );
 		add_action( 'wp_ajax_angie_push_to_production', [ __CLASS__, 'ajax_push_to_production' ] );
+		add_filter( 'post_row_actions', [ __CLASS__, 'remove_quick_edit' ], 10, 2 );
+	}
+
+	public static function remove_quick_edit( $actions, $post ) {
+		if ( Module::CPT_NAME === $post->post_type ) {
+			unset( $actions['inline hide-if-no-js'] );
+		}
+
+		return $actions;
 	}
 
 	public static function add_custom_columns( $columns ) {
@@ -25,7 +35,7 @@ class List_Table_Manager {
 			'environment' => esc_html__( 'Environment', 'angie' ),
 			'files' => esc_html__( 'Files', 'angie' ),
 			'actions' => esc_html__( 'Actions', 'angie' ),
-			'date' => $columns['date'],
+			'last_modified' => esc_html__( 'Last Modified', 'angie' ),
 		];
 
 		$taxonomy_key = 'taxonomy-' . Taxonomy_Manager::TAXONOMY_NAME;
@@ -52,6 +62,8 @@ class List_Table_Manager {
 			self::render_environment_column( $post_id );
 		} elseif ( 'actions' === $column ) {
 			self::render_actions_column( $post_id );
+		} elseif ( 'last_modified' === $column ) {
+			self::render_last_modified_column( $post_id );
 		}
 	}
 
@@ -74,6 +86,28 @@ class List_Table_Manager {
 		);
 	}
 
+	private static function render_last_modified_column( $post_id ) {
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return;
+		}
+
+		if ( '0000-00-00 00:00:00' === $post->post_modified ) {
+			$t_time = esc_html__( 'Unpublished', 'angie' );
+		} else {
+			$t_time = sprintf(
+				/* translators: 1: Post date, 2: Post time. */
+				esc_html__( '%1$s at %2$s', 'angie' ),
+				/* translators: Post date format. See https://www.php.net/manual/datetime.format.php */
+				get_the_modified_time( esc_html__( 'Y/m/d', 'angie' ), $post ),
+				/* translators: Post time format. See https://www.php.net/manual/datetime.format.php */
+				get_the_modified_time( esc_html__( 'g:i a', 'angie' ), $post )
+			);
+		}
+
+		echo esc_html( $t_time );
+	}
+
 	private static function render_files_column( $post_id ) {
 		$files = get_post_meta( $post_id, '_angie_snippet_files', true );
 		$file_count = is_array( $files ) ? count( $files ) : 0;
@@ -84,30 +118,52 @@ class List_Table_Manager {
 	}
 
 	private static function render_environment_column( $post_id ) {
+		self::render_sync_status( $post_id );
+	}
+
+	public static function render_sync_status( $post_id ) {
 		$timestamps = Dev_Mode_Manager::get_snippet_environment_timestamps( $post_id );
 		$sync_status = $timestamps['status'];
 
 		if ( Dev_Mode_Manager::SYNC_STATUS_NOT_DEPLOYED === $sync_status ) {
-		   echo '<span class="angie-env-status angie-env-not-deployed">';
-		   echo '<span class="angie-env-badge angie-env-badge-gray"></span>';
-		   echo esc_html__( 'Not Deployed', 'angie' );
-		   echo '</span>';
+			$tooltip = esc_attr__( 'Snippet has not been deployed to test or live yet', 'angie' );
+			echo '<span class="angie-env-status angie-env-not-deployed">';
+			echo '<span class="angie-env-badge angie-env-badge-test"></span>';
+			echo esc_html__( 'Not Deployed', 'angie' );
+			self::render_tooltip_icon( $tooltip );
+			echo '</span>';
 		} elseif ( Dev_Mode_Manager::SYNC_STATUS_CHANGES_PENDING === $sync_status ) {
-		   echo '<span class="angie-env-status angie-env-not-synced">';
-		   echo '<span class="angie-env-badge angie-env-badge-warning"></span>';
-		   echo esc_html__( 'Test & Live not synced', 'angie' );
-		   echo '</span>';
+			$tooltip = esc_attr__( 'Snippet is live but has unpublished changes in test', 'angie' );
+			echo '<span class="angie-env-status angie-env-not-synced">';
+			echo '<span class="angie-env-badge angie-env-badge-warning"></span>';
+			echo esc_html__( 'Live (out of sync)', 'angie' );
+			self::render_tooltip_icon( $tooltip );
+			echo '</span>';
 		} elseif ( Dev_Mode_Manager::SYNC_STATUS_TEST_ONLY === $sync_status ) {
-		   echo '<span class="angie-env-status angie-env-test-only">';
-		   echo '<span class="angie-env-badge angie-env-badge-test"></span>';
-		   echo esc_html__( 'Test Environment only', 'angie' );
-		   echo '</span>';
+			$tooltip = esc_attr__( 'Snippet is only deployed to sandbox/test, not to live', 'angie' );
+			echo '<span class="angie-env-status angie-env-test-only">';
+			echo '<span class="angie-env-badge angie-env-badge-test"></span>';
+			echo esc_html__( 'Sandbox only', 'angie' );
+			self::render_tooltip_icon( $tooltip );
+			echo '</span>';
 		} else {
-		   echo '<span class="angie-env-status angie-env-synced">';
-		   echo '<span class="angie-env-badge angie-env-badge-success"></span>';
-		   echo esc_html__( 'Live & Synced', 'angie' );
-		   echo '</span>';
+			$tooltip = esc_attr__( 'Snippet is deployed to live and matches the latest version', 'angie' );
+			echo '<span class="angie-env-status angie-env-synced">';
+			echo '<span class="angie-env-badge angie-env-badge-success"></span>';
+			echo esc_html__( 'Live (synced)', 'angie' );
+			self::render_tooltip_icon( $tooltip );
+			echo '</span>';
 		}
+	}
+
+	private static function render_tooltip_icon( $tooltip_text ) {
+		printf(
+			'<span class="angie-snippet-tooltip-trigger" data-tooltip="%s" aria-label="%s">',
+			esc_attr( $tooltip_text ),
+			esc_attr( $tooltip_text )
+		);
+		echo '<span class="angie-snippet-info-icon">i</span>';
+		echo '</span>';
 	}
 
 	private static function render_actions_column( $post_id ) {
@@ -123,12 +179,18 @@ class List_Table_Manager {
 			$is_disabled = true;
 		}
 
+		$post = get_post( $post_id );
+		$snippet_slug = $post ? $post->post_name : '';
+
 		$disabled_attr = $is_disabled ? ' disabled' : '';
-		$button_text = ( $dev_time > 0 ) ? esc_html__( 'Publish to Live', 'angie' ) : esc_html__( 'Publish to Dev', 'angie' );
+		$deploy_action = ( $dev_time > 0 ) ? 'push-to-production' : 'publish-to-dev';
+		$button_text = ( $dev_time > 0 ) ? esc_html__( 'Push to Live', 'angie' ) : esc_html__( 'Push to Test', 'angie' );
 
 		printf(
-			'<button type="button" class="button angie-push-to-production" data-post-id="%d"%s>%s</button>',
+			'<button type="button" class="button angie-push-to-production" data-post-id="%d" data-snippet-slug="%s" data-action="%s"%s>%s</button>',
 			absint( $post_id ),
+			esc_attr( $snippet_slug ),
+			esc_attr( $deploy_action ),
 			esc_attr( $disabled_attr ),
 			esc_html( $button_text )
 		);
@@ -144,34 +206,6 @@ class List_Table_Manager {
 			return;
 		}
 
-		$script_url = plugins_url( 'assets/js/list-table-toggle.js', dirname( __FILE__ ) );
-		wp_enqueue_script(
-			'angie-list-table-toggle',
-			$script_url,
-			[],
-			ANGIE_VERSION,
-			true
-		);
-
-		wp_localize_script(
-	        'angie-list-table-toggle',
-	        'angieListTableToggle', [
-	            'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-	            'nonce' => wp_create_nonce( 'angie_toggle_snippet_status' ),
-	            'pushToProductionNonce' => wp_create_nonce( 'angie_push_to_production' ),
-			    'i18n' => [
-				    'publishToDevButton' => esc_html__( 'Publish to Dev', 'angie' ),
-				    'confirmPublishToDev' => esc_html__( 'Are you sure you want to publish this snippet to dev?', 'angie' ),
-				    'confirmPushToProduction' => esc_html__( 'Are you sure you want to push this snippet to production?', 'angie' ),
-				    'pushing' => esc_html__( 'Pushing...', 'angie' ),
-				    'failedToUpdateStatus' => esc_html__( 'Failed to update status', 'angie' ),
-				    'errorOccurred' => esc_html__( 'An error occurred. Please try again.', 'angie' ),
-				    'successPushedToProduction' => esc_html__( 'Successfully pushed to production', 'angie' ),
-				    'failedToPushToProduction' => esc_html__( 'Failed to push to production', 'angie' ),
-			    ],
-	        ]
-		);
-
 		$style_url = plugins_url( 'assets/css/list-table-toggle.css', dirname( __FILE__ ) );
 		wp_enqueue_style(
 			'angie-list-table-toggle',
@@ -179,6 +213,25 @@ class List_Table_Manager {
 			[],
 			ANGIE_VERSION
 		);
+	}
+
+	public static function add_config( $config ) {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen || 'edit-' . Module::CPT_NAME !== $screen->id ) {
+			return $config;
+		}
+
+		if ( ! Module::current_user_can_manage_snippets() ) {
+			return $config;
+		}
+
+		$config['listTable'] = [
+			'ajaxUrl'               => admin_url( 'admin-ajax.php' ),
+			'nonce'                 => wp_create_nonce( 'angie_toggle_snippet_status' ),
+			'pushToProductionNonce' => wp_create_nonce( 'angie_push_to_production' ),
+		];
+
+		return $config;
 	}
 
 	public static function ajax_toggle_status() {
@@ -245,7 +298,7 @@ class List_Table_Manager {
 			$success_message = esc_html__( 'Successfully pushed to production', 'angie' );
 		} else {
 			$success = Dev_Mode_Manager::push_snippet_to_dev( $post_id );
-			$success_message = esc_html__( 'Successfully published to dev', 'angie' );
+			$success_message = esc_html__( 'Successfully published to test', 'angie' );
 		}
 
 		if ( ! $success ) {

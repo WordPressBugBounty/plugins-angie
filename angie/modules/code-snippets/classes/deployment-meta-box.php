@@ -13,6 +13,72 @@ class Deployment_Meta_Box {
 		add_action( 'add_meta_boxes', [ __CLASS__, 'add_deployment_meta_box' ] );
 		add_action( 'save_post_' . Module::CPT_NAME, [ __CLASS__, 'save_deployment_meta' ], 5 );
 		add_action( 'admin_post_angie_delete_environment', [ __CLASS__, 'handle_delete_environment' ] );
+		add_action( 'admin_enqueue_scripts', [ __CLASS__, 'enqueue_assets' ] );
+		add_action( 'post_submitbox_misc_actions', [ __CLASS__, 'render_publish_box_toggle' ] );
+		add_filter( 'angie_config', [ __CLASS__, 'add_config' ] );
+	}
+
+	public static function enqueue_assets( $hook ) {
+		if ( 'post.php' !== $hook && 'post-new.php' !== $hook ) {
+			return;
+		}
+
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen || Module::CPT_NAME !== $screen->post_type ) {
+			return;
+		}
+
+		wp_enqueue_style(
+			'angie-list-table-toggle',
+			plugins_url( 'assets/css/list-table-toggle.css', dirname( __FILE__ ) ),
+			[],
+			ANGIE_VERSION
+		);
+
+		wp_add_inline_style(
+			'angie-list-table-toggle',
+			'#misc-publishing-actions .misc-pub-section:not(.angie-publish-toggle) { display: none !important; }'
+		);
+	}
+
+	public static function add_config( $config ) {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen || Module::CPT_NAME !== $screen->post_type ) {
+			return $config;
+		}
+
+		if ( 'post' !== $screen->base && 'post-new' !== $screen->base ) {
+			return $config;
+		}
+
+		$config['deploymentMetaBox'] = [
+			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+			'nonce'   => wp_create_nonce( 'angie_toggle_snippet_status' ),
+		];
+
+		return $config;
+	}
+
+	public static function render_publish_box_toggle( $post ) {
+		if ( Module::CPT_NAME !== get_post_type( $post ) ) {
+			return;
+		}
+
+		$is_published = 'publish' === $post->post_status;
+		$checked      = $is_published ? 'checked' : '';
+
+		echo '<div class="misc-pub-section angie-publish-toggle" style="display: flex !important; align-items: center; gap: 8px; padding: 6px 10px;">';
+		echo '<strong>' . esc_html__( 'Status:', 'angie' ) . '</strong>';
+		printf(
+			'<label class="angie-snippet-toggle">
+				<input type="checkbox" class="angie-snippet-toggle-input" data-post-id="%d" %s />
+				<span class="angie-snippet-toggle-slider"></span>
+			</label>',
+			absint( $post->ID ),
+			esc_attr( $checked )
+		);
+		echo '<span class="angie-metabox-status-label">' . ( $is_published ? esc_html__( 'Active', 'angie' ) : esc_html__( 'Inactive', 'angie' ) ) . '</span>';
+		echo '</div>';
 	}
 
 	public static function add_deployment_meta_box() {
@@ -32,7 +98,6 @@ class Deployment_Meta_Box {
 		$timestamps = Dev_Mode_Manager::get_snippet_environment_timestamps( $post->ID );
 		$dev_time = $timestamps['dev'];
 		$prod_time = $timestamps['prod'];
-		$sync_status = $timestamps['status'];
 		$delete_url_base = admin_url( 'admin-post.php' );
 
 		echo '<div style="padding: 10px 0;">';
@@ -77,20 +142,13 @@ class Deployment_Meta_Box {
 		echo '</p>';
 
 		echo '<p><strong>' . esc_html__( 'Sync Status:', 'angie' ) . '</strong><br>';
-		if ( Dev_Mode_Manager::SYNC_STATUS_NOT_DEPLOYED === $sync_status ) {
-		   echo '<span style="color: #999;">' . esc_html__( 'Not Deployed', 'angie' ) . '</span>';
-		} elseif ( Dev_Mode_Manager::SYNC_STATUS_CHANGES_PENDING === $sync_status ) {
-		   echo '<span style="color: #d63638;">' . esc_html__( 'Test & Live not synced', 'angie' ) . '</span>';
-		} elseif ( Dev_Mode_Manager::SYNC_STATUS_TEST_ONLY === $sync_status ) {
-		   echo '<span style="color: #d63638;">' . esc_html__( 'Test Environment only', 'angie' ) . '</span>';
-		} else {
-		   echo '<span style="color: #00a32a;">' . esc_html__( 'Live & Synced', 'angie' ) . '</span>';
-		}
+		List_Table_Manager::render_sync_status( $post->ID );
 		echo '</p>';
 
 		echo '<p>';
-		$button_text = ( $dev_time > 0 ) ? esc_html__( 'Push to Production', 'angie' ) : esc_html__( 'Publish to Dev', 'angie' );
-		submit_button( $button_text, 'primary', 'angie_push_to_production', false );
+		$deploy_action = ( $dev_time > 0 ) ? 'push-to-production' : 'publish-to-dev';
+		$button_text = ( $dev_time > 0 ) ? esc_html__( 'Push to Production', 'angie' ) : esc_html__( 'Push to Test', 'angie' );
+		submit_button( $button_text, 'primary', 'angie_push_to_production', false, [ 'data-action' => $deploy_action ] );
 		echo '</p>';
 		echo '</div>';
 	}

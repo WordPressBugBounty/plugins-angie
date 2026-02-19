@@ -69,7 +69,7 @@ class Snippet_Repository {
 		return update_post_meta( $post_id, '_angie_snippet_files', $files );
 	}
 
-	public static function get_all_snippets() {
+	public static function get_all_snippets( $type = null ) {
 		$args = [
 			'post_type'      => Module::CPT_NAME,
 			'post_status'    => 'any',
@@ -77,6 +77,16 @@ class Snippet_Repository {
 			'orderby'        => 'title',
 			'order'          => 'ASC',
 		];
+
+		if ( ! empty( $type ) && Taxonomy_Manager::is_valid_type( $type ) ) {
+			$args['tax_query'] = [
+				[
+					'taxonomy' => Taxonomy_Manager::TAXONOMY_NAME,
+					'field'    => 'slug',
+					'terms'    => $type,
+				],
+			];
+		}
 
 		return get_posts( $args );
 	}
@@ -94,13 +104,25 @@ class Snippet_Repository {
 
 	public static function get_snippet_data( $post ) {
 		$files = self::get_snippet_files( $post->ID );
+		$terms = wp_get_object_terms( $post->ID, Taxonomy_Manager::TAXONOMY_NAME, [ 'fields' => 'slugs' ] );
+		$timestamps = Dev_Mode_Manager::get_snippet_environment_timestamps( $post->ID );
+		$is_elementor_widget = ! is_wp_error( $terms ) && in_array( 'elementor-widget', $terms, true );
 
-		return [
+		$data = [
+			'id'     => $post->ID,
 			'slug'   => self::get_snippet_slug_from_post( $post ),
 			'title'  => $post->post_title,
 			'status' => $post->post_status,
 			'files'  => self::build_file_list( $files ),
+      		'type'   => is_wp_error( $terms ) ? [] : $terms,
+			'deploymentStatus' => $timestamps['status'],
 		];
+
+		if ( $is_elementor_widget ) {
+			$data['widgetName'] = Widget_Name_Resolver::get_widget_name_for_snippet( $post->ID );
+		}
+
+		return $data;
 	}
 
 	public static function get_file_by_name( $post_id, $filename ) {

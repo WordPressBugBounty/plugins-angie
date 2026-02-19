@@ -90,7 +90,6 @@ class Sidebar_HTML {
 			})();
 		</script>
 
-		<div id='angie-wrapper'></div>
 		<div 
 			id='angie-sidebar-container'
 			role='complementary'

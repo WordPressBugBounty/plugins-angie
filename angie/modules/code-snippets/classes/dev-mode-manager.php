@@ -41,19 +41,9 @@ class Dev_Mode_Manager {
 		return $ip;
 	}
 
-	public static function create_dev_mode_session() {
-		$user_id = get_current_user_id();
-		if ( ! $user_id ) {
-			return false;
-		}
-
-		$ip_address = self::get_client_ip();
-		if ( empty( $ip_address ) ) {
-			return false;
-		}
-
+	private static function set_dev_mode_cookie( $user_id, $ip_address ) {
 		$token = self::generate_session_token( $user_id, $ip_address );
-		$expiry = time() + HOUR_IN_SECONDS;
+		$expiry = time() + YEAR_IN_SECONDS;
 		$ip_hash = hash( 'sha256', $ip_address );
 		$cookie_value = $token . '|' . $expiry . '|' . $user_id . '|' . $ip_hash;
 
@@ -66,6 +56,30 @@ class Dev_Mode_Manager {
 			is_ssl(),
 			true
 		);
+
+		return $expiry;
+	}
+
+	private static function extend_dev_mode_session( $user_id, $ip_address ) {
+		if ( headers_sent() ) {
+			return;
+		}
+
+		self::set_dev_mode_cookie( $user_id, $ip_address );
+	}
+
+	public static function create_dev_mode_session() {
+		$user_id = get_current_user_id();
+		if ( ! $user_id ) {
+			return false;
+		}
+
+		$ip_address = self::get_client_ip();
+		if ( empty( $ip_address ) ) {
+			return false;
+		}
+
+		$expiry = self::set_dev_mode_cookie( $user_id, $ip_address );
 
 		return [
 			'expiry'  => $expiry,
@@ -118,6 +132,8 @@ class Dev_Mode_Manager {
 		if ( ! hash_equals( $expected_token, $token ) ) {
 			return false;
 		}
+
+		self::extend_dev_mode_session( $user_id, $current_ip );
 
 		return true;
 	}

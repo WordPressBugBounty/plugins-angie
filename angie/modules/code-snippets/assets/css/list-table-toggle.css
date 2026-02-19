@@ -1,3 +1,58 @@
+.wrap .page-title-action {
+	display: none;
+}
+
+.angie-snippet-tooltip-trigger {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	cursor: help;
+}
+
+.angie-snippet-info-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background-color: #72777c;
+	color: #fff;
+	font-size: 11px;
+	font-weight: 600;
+	font-style: italic;
+	line-height: 1;
+}
+
+.angie-snippet-tooltip-trigger:hover .angie-snippet-info-icon {
+	background-color: #2271b1;
+}
+
+.angie-snippet-tooltip-popover {
+	position: fixed;
+	z-index: 100000;
+	display: none;
+	max-width: 260px;
+	padding: 10px 12px;
+	background-color: #1d2327;
+	color: #f0f0f1;
+	font-size: 13px;
+	line-height: 1.4;
+	border-radius: 4px;
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+	pointer-events: none;
+}
+
+.angie-snippet-tooltip-popover::after {
+	content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	margin-left: -6px;
+	border: 6px solid transparent;
+	border-top-color: #1d2327;
+}
+
 .angie-snippet-toggle {
 	position: relative;
 	display: inline-block;
@@ -71,7 +126,20 @@
 .angie-env-status {
 	display: inline-flex;
 	align-items: center;
-	gap: 8px;
+	gap: 6px;
+}
+
+.angie-env-synced {
+	color: #00a32a;
+}
+
+.angie-env-not-synced {
+	color: #dba617;
+}
+
+.angie-env-not-deployed,
+.angie-env-test-only {
+	color: #d63638;
 }
 
 .angie-env-badge {
