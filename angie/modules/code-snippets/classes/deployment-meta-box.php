@@ -146,9 +146,14 @@ class Deployment_Meta_Box {
 		echo '</p>';
 
 		echo '<p>';
+		$is_deploy_button_disabled = Dev_Mode_Manager::is_deploy_button_disabled( $dev_time, $prod_time );
 		$deploy_action = ( $dev_time > 0 ) ? 'push-to-production' : 'publish-to-dev';
 		$button_text = ( $dev_time > 0 ) ? esc_html__( 'Push to Production', 'angie' ) : esc_html__( 'Push to Test', 'angie' );
-		submit_button( $button_text, 'primary', 'angie_push_to_production', false, [ 'data-action' => $deploy_action ] );
+		$button_attrs = [ 'data-action' => $deploy_action ];
+		if ( $is_deploy_button_disabled ) {
+			$button_attrs['disabled'] = 'disabled';
+		}
+		submit_button( $button_text, 'primary', 'angie_push_to_production', false, $button_attrs );
 		echo '</p>';
 		echo '</div>';
 	}

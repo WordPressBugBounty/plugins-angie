@@ -36,7 +36,11 @@ class Angie_App {
 	public static function register_main_menu( $callback = null ) {
 		// Custom SVG icon for Angie menu
 		$svg_icon = 'data:image/svg+xml;base64,' . base64_encode(
-			'<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#a7aaad" viewBox="0 0 20 20"><path d="M0 3.36h3.36v14.428H0zM17.788 0v3.36H3.36V0zM12.225 4.413c.818 3.938 3.701 7.21 7.719 7.79-4.146.6-7.035 3.622-7.72 7.74-.643-3.872-3.96-6.885-7.755-7.74 3.798-.814 7.063-3.946 7.756-7.79ZM17.748 4.47c.233 1.113 1.109 2.036 2.252 2.2-1.18.17-2.057 1.047-2.252 2.213-.183-1.096-1.081-1.971-2.161-2.213 1.08-.23 1.964-1.113 2.16-2.2Z"/></svg>'
+			'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+<path d="M21.7142 12.0059L21.0316 12.2611C19.4275 12.8645 18.4491 14.1524 17.8575 15.7883L17.6072 16.4845L17.3569 15.7883C16.7653 14.1524 15.73 12.8645 14.1259 12.2611L13.4433 12.0059L14.1259 11.7506C15.73 11.1473 16.7653 9.85935 17.3569 8.22337L17.6072 7.52721L17.8575 8.22337C18.4491 9.85935 19.4275 11.1473 21.0316 11.7506L21.7142 12.0059Z" fill="#ABAFB2"/>
+<path d="M3 11.1104C8.94295 11.1104 13.707 16.0116 13.707 22L10.707 22C10.707 17.6126 7.23077 14.1104 3 14.1104L3 11.1104Z" fill="#ABAFB2"/>
+<path d="M3 9.88965C7.23076 9.88965 10.707 6.38737 10.707 2L13.707 2C13.707 7.98835 8.94295 12.8896 3 12.8896L3 9.88965Z" fill="#ABAFB2"/>
+</svg>'
 		);
 
 		add_menu_page(
@@ -242,10 +246,9 @@ class Angie_App {
 				<div class="angie-app-layout" data-testid="angie-app-layout">
 						<div class="angie-app-start" id="angie-app-start" data-testid="angie-app-start">
 						<h4>
-							<?php esc_html_e( 'Meet Angie,', 'angie' ); ?><br>
-							<?php esc_html_e( 'your new AI assistant', 'angie' ); ?>
+							<?php esc_html_e( 'Let\'s build something new with Angie', 'angie' ); ?><br>
 						</h4>
-					<p><?php esc_html_e( 'Build and manage WordPress sites effortlessly with Agentic AI.', 'angie' ); ?></p>
+						<p><?php esc_html_e( 'Generate custom Elementor widgets, forms, layouts, and code snippets tailored to your site.', 'angie' ); ?><br><?php esc_html_e( 'Scale your capabilities and experiment freely. Everything is editable and nothing goes live until you approve.', 'angie' ); ?></p>
 					<?php if ( $is_in_oauth_flow ) : ?>
 							<div class="angie-loading-state" data-testid="angie-loading-state">
 								<div class="angie-spinner"></div>

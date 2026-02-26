@@ -4,13 +4,13 @@ Tags: ai, artificial intelligence, elementor, assistant, automation
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Angie Code: Your expert WordPress developer, powered by AI. Build anything you can imagine without writing a single line of code.
-
 == Description ==
+
+Angie Code: Your expert WordPress developer, powered by AI. Build anything you can imagine without writing a single line of code.
 
 **Disclaimer:** Angie is currently in Beta. While core functionality within WordPress and the Elementor Editor is stable and ready to explore, some actions and integrations with third-party tools are still evolving. We are continuously refining Angie's capabilities and expanding its capabilities. Please ensure you back up your site before use. During this Beta phase, enjoy free daily credits and help us shape the future of AI-driven web creation with your feedback.
 
@@ -160,6 +160,12 @@ Not at all. Angie is built for creators worldwide. You can prompt Angie in your 
 Language should never be a barrier to bringing your WordPress ideas to life.
 
 == Changelog ==
+
+= 1.1.1 - 2026-02-26 =
+* Tweak: Improved Code Snippets user interface
+* Tweak: Added support for multiple snippet types
+* Tweak: Refactored Code Snippets feature for improved structure
+* Tweak: User interface refinements
 
 = 1.1.0 - 2026-02-19 =
 * New: Angie Code: build custom Elementor widgets, Gutenberg blocks, code snippets, custom functionality, and interactive apps through conversation

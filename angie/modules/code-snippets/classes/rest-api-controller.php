@@ -35,6 +35,125 @@ class Rest_Api_Controller {
 						],
 					],
 				],
+				[
+					'methods' => \WP_REST_Server::CREATABLE,
+					'callback' => [ $this, 'create_snippet_post' ],
+					'permission_callback' => [ $this, 'check_permission' ],
+					'args' => [
+						'title' => [
+							'required'          => true,
+							'type'              => 'string',
+							'sanitize_callback' => 'sanitize_text_field',
+						],
+						'type' => [
+							'required'          => false,
+							'type'              => 'string',
+							'sanitize_callback' => 'sanitize_text_field',
+						],
+					],
+				],
+			]
+		);
+
+		register_rest_route(
+			self::NAMESPACE,
+			'/snippets/(?P<id>\d+)',
+			[
+				[
+					'methods' => \WP_REST_Server::DELETABLE,
+					'callback' => [ $this, 'delete_snippet' ],
+					'permission_callback' => [ $this, 'check_permission' ],
+					'args' => [
+						'id' => [
+							'required' => true,
+							'type' => 'integer',
+							'sanitize_callback' => 'absint',
+						],
+					],
+				],
+			]
+		);
+
+		register_rest_route(
+			self::NAMESPACE,
+			'/snippets/(?P<id>\d+)/files',
+			[
+				[
+					'methods' => \WP_REST_Server::READABLE,
+					'callback' => [ $this, 'list_snippet_files' ],
+					'permission_callback' => [ $this, 'check_permission' ],
+					'args' => [
+						'id' => [
+							'required' => true,
+							'type' => 'integer',
+							'sanitize_callback' => 'absint',
+						],
+					],
+				],
+				[
+					'methods' => 'PUT, PATCH',
+					'callback' => [ $this, 'update_snippet_files' ],
+					'permission_callback' => [ $this, 'check_permission' ],
+					'args' => [
+						'id' => [
+							'required' => true,
+							'type' => 'integer',
+							'sanitize_callback' => 'absint',
+						],
+						'files' => [
+							'required' => true,
+							'type' => 'array',
+						],
+						'type' => [
+							'required' => false,
+							'type' => 'string',
+							'sanitize_callback' => 'sanitize_text_field',
+						],
+					],
+				],
+			]
+		);
+
+		register_rest_route(
+			self::NAMESPACE,
+			'/snippets/(?P<id>\d+)/files/(?P<filename>.+)',
+			[
+				[
+					'methods' => \WP_REST_Server::READABLE,
+					'callback' => [ $this, 'get_snippet_file' ],
+					'permission_callback' => [ $this, 'check_permission' ],
+					'args' => [
+						'id' => [
+							'required' => true,
+							'type' => 'integer',
+							'sanitize_callback' => 'absint',
+						],
+						'filename' => [
+							'required' => true,
+							'type' => 'string',
+							'sanitize_callback' => 'sanitize_text_field',
+						],
+					],
+				],
+			]
+		);
+
+		register_rest_route(
+			self::NAMESPACE,
+			'/snippets/(?P<id>\d+)/publish',
+			[
+				[
+					'methods' => \WP_REST_Server::CREATABLE,
+					'callback' => [ $this, 'publish_snippet' ],
+					'permission_callback' => [ $this, 'check_permission' ],
+					'args' => [
+						'id' => [
+							'required' => true,
+							'type' => 'integer',
+							'sanitize_callback' => 'absint',
+						],
+					],
+				],
 			]
 		);
 
@@ -108,6 +227,14 @@ class Rest_Api_Controller {
 							'required' => false,
 							'type' => 'string',
 							'sanitize_callback' => 'sanitize_text_field',
+						],
+						'types'     => [
+							'required' => false,
+							'type'     => 'array',
+							'items'    => [
+								'type'              => 'string',
+								'sanitize_callback' => 'sanitize_text_field',
+							],
 						],
 					],
 				],
@@ -250,8 +377,7 @@ class Rest_Api_Controller {
 	}
 
 	public function list_snippet_files( $request ) {
-		$slug = $request->get_param( 'slug' );
-		$post = Snippet_Repository::find_snippet_post_by_slug( $slug );
+		$post = $this->resolve_snippet_post( $request );
 
 		if ( ! $post ) {
 			return new \WP_Error(
@@ -270,9 +396,8 @@ class Rest_Api_Controller {
 	}
 
 	public function get_snippet_file( $request ) {
-		$slug = $request->get_param( 'slug' );
+		$post = $this->resolve_snippet_post( $request );
 		$filename = $request->get_param( 'filename' );
-		$post = Snippet_Repository::find_snippet_post_by_slug( $slug );
 
 		if ( ! $post ) {
 			return new \WP_Error(
@@ -299,9 +424,9 @@ class Rest_Api_Controller {
 		}
 
 		return rest_ensure_response( [
-			'name' => $file['name'],
+			'name'    => $file['name'],
 			'content' => $content,
-			'size' => strlen( $content ),
+			'size'    => strlen( $content ),
 		] );
 	}
 
@@ -309,7 +434,13 @@ class Rest_Api_Controller {
 		$slug = $request->get_param( 'slug' );
 		$files = $request->get_param( 'files' );
 		$overwrite = $request->get_param( 'overwrite' );
-		$type = $request->get_param( 'type' );
+		$types     = $request->get_param( 'types' );
+		if ( ! is_array( $types ) || empty( $types ) ) {
+			$single_type = $request->get_param( 'type' );
+			if ( is_string( $single_type ) && '' !== trim( $single_type ) ) {
+				$types = [ sanitize_text_field( $single_type ) ];
+			}
+		}
 
 		if ( ! is_array( $files ) || empty( $files ) ) {
 			return new \WP_Error(
@@ -395,16 +526,28 @@ class Rest_Api_Controller {
 			);
 		}
 
-		if ( ! empty( $type ) && ! Taxonomy_Manager::is_valid_type( $type ) ) {
-			return new \WP_Error(
-				'invalid_type',
-				sprintf(
-					/* translators: %s: provided type value */
-					esc_html__( 'Invalid snippet type: %s. Valid types are: code-snippet, elementor-widget, gutenberg-block, popup, form, visual-app.', 'angie' ),
-					$type
-				),
-				[ 'status' => 400 ]
-			);
+		if ( ! empty( $types ) ) {
+			if ( ! is_array( $types ) ) {
+				return new \WP_Error(
+					'invalid_types',
+					esc_html__( 'Types parameter must be an array.', 'angie' ),
+					[ 'status' => 400 ]
+				);
+			}
+
+			foreach ( $types as $snippet_type ) {
+				if ( ! Taxonomy_Manager::is_valid_type( $snippet_type ) ) {
+					return new \WP_Error(
+						'invalid_type',
+						sprintf(
+							/* translators: %s: provided type value */
+							esc_html__( 'Invalid snippet type: %s. Valid types are: code-snippet, elementor-widget, gutenberg-block, popup, form, visual-app.', 'angie' ),
+							$snippet_type
+						),
+						[ 'status' => 400 ]
+					);
+				}
+			}
 		}
 
 		$post = Snippet_Repository::find_snippet_post_by_slug( $slug );
@@ -428,8 +571,8 @@ class Rest_Api_Controller {
 				);
 			}
 
-			if ( ! empty( $type ) ) {
-				wp_set_object_terms( $post_id, $type, Taxonomy_Manager::TAXONOMY_NAME );
+			if ( ! empty( $types ) ) {
+				wp_set_object_terms( $post_id, $types, Taxonomy_Manager::TAXONOMY_NAME );
 			}
 
 			Snippet_Repository::update_snippet_files( $post_id, $sanitized_files );
@@ -465,8 +608,8 @@ class Rest_Api_Controller {
 			);
 		}
 
-		if ( ! empty( $type ) ) {
-			wp_set_object_terms( $post->ID, $type, Taxonomy_Manager::TAXONOMY_NAME );
+		if ( ! empty( $types ) ) {
+			wp_set_object_terms( $post->ID, $types, Taxonomy_Manager::TAXONOMY_NAME );
 		}
 
 		Snippet_Repository::update_snippet_files( $post->ID, $merged_files );
@@ -484,8 +627,7 @@ class Rest_Api_Controller {
 	}
 
 	public function delete_snippet( $request ) {
-		$slug = $request->get_param( 'slug' );
-		$post = Snippet_Repository::find_snippet_post_by_slug( $slug );
+		$post = $this->resolve_snippet_post( $request );
 
 		if ( ! $post ) {
 			return new \WP_Error(
@@ -513,7 +655,7 @@ class Rest_Api_Controller {
 		return rest_ensure_response( [
 			'success' => true,
 			'message' => esc_html__( 'Snippet deleted successfully.', 'angie' ),
-			'slug' => $slug,
+			'post_id' => $post->ID,
 		] );
 	}
 
@@ -548,8 +690,7 @@ class Rest_Api_Controller {
 	}
 
 	public function publish_snippet( $request ) {
-		$slug = $request->get_param( 'slug' );
-		$post = Snippet_Repository::find_snippet_post_by_slug( $slug );
+		$post = $this->resolve_snippet_post( $request );
 
 		if ( ! $post ) {
 			return new \WP_Error(
@@ -575,10 +716,209 @@ class Rest_Api_Controller {
 		return rest_ensure_response( [
 			'success' => true,
 			'message' => esc_html__( 'Snippet published to production successfully.', 'angie' ),
-			'slug' => $slug,
 			'post_id' => $post->ID,
-			'files' => count( $files ),
+			'files'   => count( $files ),
 		] );
+	}
+
+	public function create_snippet_post( $request ) {
+		$title = $request->get_param( 'title' );
+		$type = $request->get_param( 'type' );
+
+		if ( empty( $title ) ) {
+			return new \WP_Error(
+				'missing_title',
+				esc_html__( 'Title is required.', 'angie' ),
+				[ 'status' => 400 ]
+			);
+		}
+
+		if ( ! empty( $type ) && ! Taxonomy_Manager::is_valid_type( $type ) ) {
+			return new \WP_Error(
+				'invalid_type',
+				sprintf(
+					/* translators: %s: provided type value */
+					esc_html__( 'Invalid snippet type: %s.', 'angie' ),
+					$type
+				),
+				[ 'status' => 400 ]
+			);
+		}
+
+		$post_id = Snippet_Repository::create_snippet( $title );
+
+		if ( is_wp_error( $post_id ) ) {
+			return new \WP_Error(
+				'snippet_create_failed',
+				esc_html__( 'Failed to create snippet.', 'angie' ),
+				[ 'status' => 500 ]
+			);
+		}
+
+		if ( ! empty( $type ) ) {
+			wp_set_object_terms( $post_id, $type, Taxonomy_Manager::TAXONOMY_NAME );
+		}
+
+		return rest_ensure_response( [
+			'id'    => $post_id,
+			'title' => sanitize_text_field( $title ),
+		] );
+	}
+
+	public function update_snippet_files( $request ) {
+		$post = $this->resolve_snippet_post( $request );
+
+		if ( ! $post ) {
+			return new \WP_Error(
+				'snippet_not_found',
+				esc_html__( 'Snippet not found.', 'angie' ),
+				[ 'status' => 404 ]
+			);
+		}
+
+		$files = $request->get_param( 'files' );
+		$type = $request->get_param( 'type' );
+
+		$existing_files = Snippet_Repository::get_snippet_files_by_post( $post );
+		$merged_files = Snippet_Repository::merge_snippet_files( $existing_files, $files );
+
+		$sanitized_files = $this->sanitize_uploaded_files( $merged_files );
+		if ( is_wp_error( $sanitized_files ) ) {
+			return $sanitized_files;
+		}
+
+		if ( ! Snippet_Repository::has_main_php_file( $sanitized_files ) ) {
+			return new \WP_Error(
+				'main_php_required',
+				esc_html__( 'Snippet must have a main.php file.', 'angie' ),
+				[ 'status' => 400 ]
+			);
+		}
+
+		if ( ! empty( $type ) && ! Taxonomy_Manager::is_valid_type( $type ) ) {
+			return new \WP_Error(
+				'invalid_type',
+				sprintf(
+					/* translators: %s: provided type value */
+					esc_html__( 'Invalid snippet type: %s.', 'angie' ),
+					$type
+				),
+				[ 'status' => 400 ]
+			);
+		}
+
+		if ( ! empty( $type ) ) {
+			wp_set_object_terms( $post->ID, $type, Taxonomy_Manager::TAXONOMY_NAME );
+		}
+
+		Snippet_Repository::update_snippet_files( $post->ID, $sanitized_files );
+		File_System_Handler::write_snippet_files_to_disk( Dev_Mode_Manager::ENV_DEV, $post->ID, $sanitized_files );
+		Cache_Manager::clear_published_snippet_cache();
+
+		return rest_ensure_response( [
+			'success' => true,
+			'message' => esc_html__( 'Snippet files updated successfully.', 'angie' ),
+			'post_id' => $post->ID,
+			'files'   => count( $sanitized_files ),
+		] );
+	}
+
+	private function resolve_snippet_post( $request ) {
+		$id = $request->get_param( 'id' );
+
+		if ( $id ) {
+			return Snippet_Repository::find_snippet_post_by_id( $id );
+		}
+
+		return Snippet_Repository::find_snippet_post_by_slug( $request->get_param( 'slug' ) );
+	}
+
+	private function sanitize_uploaded_files( $files ) {
+		if ( ! is_array( $files ) || empty( $files ) ) {
+			return new \WP_Error(
+				'invalid_files',
+				esc_html__( 'Files parameter must be a non-empty array.', 'angie' ),
+				[ 'status' => 400 ]
+			);
+		}
+
+		if ( count( $files ) > self::MAX_FILES_PER_REQUEST ) {
+			return new \WP_Error(
+				'too_many_files',
+				sprintf(
+					/* translators: %d: maximum number of files */
+					esc_html__( 'Cannot process more than %d files per request.', 'angie' ),
+					self::MAX_FILES_PER_REQUEST
+				),
+				[ 'status' => 400 ]
+			);
+		}
+
+		$sanitized_files = [];
+
+		foreach ( $files as $file ) {
+			if ( ! isset( $file['name'] ) || ! isset( $file['content'] ) ) {
+				return new \WP_Error(
+					'invalid_file_format',
+					esc_html__( 'Each file must have "name" and "content" properties.', 'angie' ),
+					[ 'status' => 400 ]
+				);
+			}
+
+			$name = File_Validator::sanitize_filename( $file['name'] );
+			$content = $file['content'];
+
+			if ( empty( $name ) ) {
+				return new \WP_Error(
+					'invalid_filename',
+					esc_html__( 'File name cannot be empty or contains invalid characters.', 'angie' ),
+					[ 'status' => 400 ]
+				);
+			}
+
+			$allowed_extensions = [ 'php', 'css', 'js' ];
+			$extension = strtolower( pathinfo( $name, PATHINFO_EXTENSION ) );
+			if ( ! in_array( $extension, $allowed_extensions, true ) ) {
+				return new \WP_Error(
+					'invalid_file_type',
+					sprintf(
+						/* translators: %s: filename */
+						esc_html__( 'Invalid file type for: %s. Only PHP, CSS, and JS files are allowed.', 'angie' ),
+						$name
+					),
+					[ 'status' => 400 ]
+				);
+			}
+
+			if ( strlen( $content ) > self::MAX_FILE_SIZE_BYTES ) {
+				return new \WP_Error(
+					'file_too_large',
+					sprintf(
+						/* translators: %s: filename */
+						esc_html__( 'File too large: %s. Maximum size is 100KB.', 'angie' ),
+						$name
+					),
+					[ 'status' => 400 ]
+				);
+			}
+
+			$sanitized_files[] = [
+				'name'        => $name,
+				'content_b64' => base64_encode( $content ),
+			];
+		}
+
+		$validation_result = Snippet_Validator::validate_snippet_files( $sanitized_files );
+
+		if ( is_wp_error( $validation_result ) ) {
+			return new \WP_Error(
+				$validation_result->get_error_code(),
+				$validation_result->get_error_message(),
+				[ 'status' => 400 ]
+			);
+		}
+
+		return $sanitized_files;
 	}
 
 	public function validate_snippet( $request ) {
@@ -606,17 +946,20 @@ class Rest_Api_Controller {
 			$name    = sanitize_text_field( $file['name'] );
 			$content = $file['content'];
 
-			$check_result = File_Validator::check_forbidden_functions( $content );
-			if ( ! $check_result['allowed'] ) {
-				return new \WP_Error(
-					'forbidden_function',
-					sprintf(
-						/* translators: %s: function name */
-						esc_html__( 'Forbidden function detected: %s', 'angie' ),
-						$check_result['function']
-					),
-					[ 'status' => 400 ]
-				);
+			$extension = strtolower( pathinfo( $name, PATHINFO_EXTENSION ) );
+			if ( 'php' === $extension ) {
+				$check_result = File_Validator::check_forbidden_functions( $content );
+				if ( ! $check_result['allowed'] ) {
+					return new \WP_Error(
+						'forbidden_function',
+						sprintf(
+							/* translators: %s: function name */
+							esc_html__( 'Forbidden function detected: %s', 'angie' ),
+							$check_result['function']
+						),
+						[ 'status' => 400 ]
+					);
+				}
 			}
 
 			$sanitized_files[] = [

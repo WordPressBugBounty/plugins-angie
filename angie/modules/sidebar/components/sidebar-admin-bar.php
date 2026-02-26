@@ -56,17 +56,17 @@ class Sidebar_Admin_Bar {
 		if ( $wp_admin_bar ) {
 			$wp_admin_bar->add_node( [
 				'id'    => 'angie-sidebar-toggle',
-				'title' => 'Toggle Angie',
+				'title' => '',
 				'href'  => '#',
 				'meta'  => [
 					'class' => 'angie-sidebar-toggle-item',
-					'title' => 'Toggle Angie',
+					'title' => '',
 				],
 			] );
 		} else {
 			// No admin bar object = Elementor editor context, just create the basic element JavaScript needs
 			echo '<div id="wp-admin-bar-angie-sidebar-toggle" class="angie-sidebar-toggle-item" style="display: none;">
-				<a href="#" class="ab-item" title="Toggle Angie">Toggle Angie</a>
+				<a href="#" class="ab-item" title=""></a>
 			</div>';
 		}
 	}

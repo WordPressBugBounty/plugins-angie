@@ -27,7 +27,7 @@ class Dev_Mode_Admin_UI {
 		$is_dev_mode = Dev_Mode_Manager::is_dev_mode_enabled();
 
 		if ( $is_dev_mode ) {
-			echo '<div class="notice notice-warning is-dismissible">';
+			echo '<div class="notice notice-warning">';
 			echo '<p>';
 			echo '<strong>' . esc_html__( 'Test Mode is Active', 'angie' ) . '</strong> - ' . esc_html__( 'Snippets are loading from the development environment.', 'angie' ) . ' ';
 			echo '<button type="button" class="button button-secondary" id="angie-disable-dev-mode">' . esc_html__( 'Disable Test Mode', 'angie' ) . '</button>';

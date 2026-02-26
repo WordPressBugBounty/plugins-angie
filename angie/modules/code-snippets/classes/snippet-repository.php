@@ -9,6 +9,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Snippet_Repository {
 
+	public static function find_snippet_post_by_id( $id ) {
+		$post = get_post( (int) $id );
+
+		if ( ! $post || Module::CPT_NAME !== $post->post_type ) {
+			return null;
+		}
+
+		return $post;
+	}
+
 	public static function find_snippet_post_by_slug( $slug ) {
 		$args = [
 			'post_type'      => Module::CPT_NAME,
@@ -43,14 +53,12 @@ class Snippet_Repository {
 		return $slug;
 	}
 
-	public static function create_snippet( $slug ) {
-		$post_id = wp_insert_post( [
-			'post_title'  => $slug,
+	public static function create_snippet( $title ) {
+		return wp_insert_post( [
+			'post_title'  => sanitize_text_field( $title ),
 			'post_type'   => Module::CPT_NAME,
 			'post_status' => 'publish',
 		], true );
-
-		return $post_id;
 	}
 
 	public static function delete_snippet( $post_id ) {
@@ -67,6 +75,19 @@ class Snippet_Repository {
 
 	public static function update_snippet_files( $post_id, $files ) {
 		return update_post_meta( $post_id, '_angie_snippet_files', $files );
+	}
+
+	public static function get_snippet_files_by_post( $post ) {
+		$files = self::get_snippet_files( $post->ID );
+		foreach ( $files as &$file ) {
+			if ( ! isset( $file['content_b64'] ) || ! is_string( $file['content_b64'] ) ) {
+				$file['content'] = '';
+				continue;
+			}
+			$decoded = base64_decode( $file['content_b64'], true );
+			$file['content'] = ( false === $decoded ) ? '' : $decoded;
+		}
+		return $files;
 	}
 
 	public static function get_all_snippets( $type = null ) {
@@ -105,17 +126,18 @@ class Snippet_Repository {
 	public static function get_snippet_data( $post ) {
 		$files = self::get_snippet_files( $post->ID );
 		$terms = wp_get_object_terms( $post->ID, Taxonomy_Manager::TAXONOMY_NAME, [ 'fields' => 'slugs' ] );
+		$types = is_wp_error( $terms ) ? [] : $terms;
 		$timestamps = Dev_Mode_Manager::get_snippet_environment_timestamps( $post->ID );
 		$is_elementor_widget = ! is_wp_error( $terms ) && in_array( 'elementor-widget', $terms, true );
 
 		$data = [
-			'id'     => $post->ID,
-			'slug'   => self::get_snippet_slug_from_post( $post ),
-			'title'  => $post->post_title,
-			'status' => $post->post_status,
-			'files'  => self::build_file_list( $files ),
-      		'type'   => is_wp_error( $terms ) ? [] : $terms,
-			'deploymentStatus' => $timestamps['status'],
+			'id'                => $post->ID,
+			'slug'              => self::get_snippet_slug_from_post( $post ),
+			'title'             => $post->post_title,
+			'status'            => $post->post_status,
+			'types'             => $types,
+			'files'             => self::build_file_list( $files ),
+			'deploymentStatus'  => $timestamps['status'],
 		];
 
 		if ( $is_elementor_widget ) {

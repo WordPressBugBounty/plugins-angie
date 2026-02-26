@@ -176,6 +176,10 @@ class Dev_Mode_Manager {
 		];
 	}
 
+	public static function is_deploy_button_disabled( $dev_time, $prod_time ) {
+		return $dev_time > 0 && $prod_time >= $dev_time;
+	}
+
 	public static function push_snippet_to_dev( $post_id ) {
 		$files = get_post_meta( $post_id, '_angie_snippet_files', true );
 		if ( ! is_array( $files ) || empty( $files ) ) {

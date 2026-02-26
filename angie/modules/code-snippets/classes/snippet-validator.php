@@ -9,6 +9,11 @@ class Snippet_Validator {
 
 	public static function validate_snippet_files( $files ) {
 		foreach ( $files as $file ) {
+			$extension = strtolower( pathinfo( $file['name'], PATHINFO_EXTENSION ) );
+			if ( 'php' !== $extension ) {
+				continue;
+			}
+
 			$content_clean = base64_decode( $file['content_b64'] );
 
 			$check_result = File_Validator::check_forbidden_functions( $content_clean );

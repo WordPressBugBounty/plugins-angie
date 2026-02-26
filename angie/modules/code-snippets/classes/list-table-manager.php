@@ -170,19 +170,12 @@ class List_Table_Manager {
 		$timestamps = Dev_Mode_Manager::get_snippet_environment_timestamps( $post_id );
 		$dev_time = $timestamps['dev'];
 		$prod_time = $timestamps['prod'];
-
-		if ( $dev_time === 0 ) {
-			$is_disabled = false;
-		} elseif ( $dev_time > 0 && ( $prod_time === 0 || $dev_time > $prod_time ) ) {
-			$is_disabled = false;
-		} else {
-			$is_disabled = true;
-		}
+		$is_deploy_button_disabled = Dev_Mode_Manager::is_deploy_button_disabled( $dev_time, $prod_time );
 
 		$post = get_post( $post_id );
 		$snippet_slug = $post ? $post->post_name : '';
 
-		$disabled_attr = $is_disabled ? ' disabled' : '';
+		$disabled_attr = $is_deploy_button_disabled ? ' disabled' : '';
 		$deploy_action = ( $dev_time > 0 ) ? 'push-to-production' : 'publish-to-dev';
 		$button_text = ( $dev_time > 0 ) ? esc_html__( 'Push to Live', 'angie' ) : esc_html__( 'Push to Test', 'angie' );
 
