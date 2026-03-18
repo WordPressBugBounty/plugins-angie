@@ -16,8 +16,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Creates a welcome page for managing consent settings with OAuth integration
  */
 class Consent_Page {
+	private $consent_manager_module_file;
 
 	public function __construct() {
+		$this->consent_manager_module_file = dirname( __DIR__ ) . '/module.php';
+
 		add_action( 'admin_menu', [ $this, 'register_admin_menu' ], 20 );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 		add_action( 'rest_api_init', [ $this, 'register_rest_routes' ] );
@@ -170,36 +173,58 @@ class Consent_Page {
 		
 		<div class="angie-welcome-page" data-testid="angie-welcome-page">
 			<div class="angie-welcome-layout" data-testid="angie-welcome-layout">
-				<!-- Left Side Content -->
-				<div class="angie-welcome-left" data-testid="angie-welcome-left">
-					<h4><?php esc_html_e( 'Ready to unlock Angie\'s full potential?', 'angie' ); ?></h4>
-					<p><?php esc_html_e( 'Meet Angie, Agentic AI built for WordPress that gets real work done for you. From launching pages to bulk updates, Angie turns hours of manual tasks into minutes so you can stay focused on what matters.', 'angie' ); ?></p>
-					
-					<div class="angie-consent-section" data-testid="angie-consent-section">
-						<label class="angie-consent-checkbox" data-testid="angie-consent-checkbox">
-							<input type="checkbox" id="angie-terms-consent" />
-							<span class="checkmark"></span>
-							<span class="consent-text">
-								<?php esc_html_e( 'I agree to the ', 'angie' ); ?>
-								<a href="https://go.elementor.com/angie-terms" target="_blank"><?php esc_html_e( 'Terms of Service', 'angie' ); ?></a>
-								<?php esc_html_e( ' and ', 'angie' ); ?>
-								<a href="https://go.elementor.com/ai-privacy-policy/" target="_blank"><?php esc_html_e( 'Privacy Policy', 'angie' ); ?></a>.
-							</span>
-						</label>
+				<div class="angie-welcome-hero" data-testid="angie-welcome-hero">
+					<div class="angie-welcome-left" data-testid="angie-welcome-left">
+						<div class="angie-title-container">
+							<img src="<?php echo esc_url( Utils::get_asset_url( 'angieIcon.svg', $this->consent_manager_module_file ) ); ?>"
+								alt="" class="angie-title-icon" />
+							<h4>
+								<span class="angie-title-gradient" aria-hidden="true"><?php esc_html_e( 'Angie', 'angie' ); ?></span><?php esc_html_e( ': Agentic AI For WordPress.', 'angie' ); ?>
+							</h4>
+						</div>
+						<p class="angie-subtitle">
+							<?php esc_html_e( 'Angie turns your ideas, screenshots, or URLs into working WordPress components.', 'angie' ); ?>
+						</p>
+						<div class="angie-consent-section" data-testid="angie-consent-section">
+							<label class="angie-consent-checkbox" data-testid="angie-consent-checkbox">
+								<input type="checkbox" id="angie-terms-consent" />
+								<span class="checkmark"></span>
+								<span class="consent-text">
+									<?php esc_html_e( 'I agree to the ', 'angie' ); ?>
+									<a href="https://go.elementor.com/angie-terms" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Terms', 'angie' ); ?></a>
+									<?php esc_html_e( ' & ', 'angie' ); ?>
+									<a href="https://go.elementor.com/ai-privacy-policy/" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Privacy Policy', 'angie' ); ?></a>.
+								</span>
+							</label>
+						</div>
+						<button class="angie-signin-button" id="angie-signin-btn" disabled data-testid="angie-signin-btn">
+							<?php esc_html_e( 'Sign in', 'angie' ); ?>
+						</button>
 					</div>
+					<div class="angie-welcome-right" data-testid="angie-welcome-right">
 					
-					<button class="angie-signin-button" id="angie-signin-btn" disabled data-testid="angie-signin-btn">
-						<?php esc_html_e( 'Sign in to continue', 'angie' ); ?>
-					</button>
+							<img src="<?php echo esc_url( Utils::get_asset_url( 'angieAppHero.png', $this->consent_manager_module_file ) ); ?>"
+								alt="<?php esc_attr_e( 'Ask Angie AI Assistant', 'angie' ); ?>"
+								class="angie-ask-image" data-testid="angie-ask-image" />
+					
+					</div>
 				</div>
-				
-				<!-- Right Side - Image -->
-				<div class="angie-welcome-right" data-testid="angie-welcome-right">
-					<div class="angie-right-container" data-testid="angie-right-container">
-						<img src="<?php echo esc_url( Utils::get_asset_url( 'askAngieImage.png', __DIR__ ) ); ?>" 
-							 alt="<?php esc_attr_e( 'Ask Angie AI Assistant', 'angie' ); ?>" 
-							 class="angie-ask-image" data-testid="angie-ask-image" />
-					</div>
+				<?php
+				$feature_cards = $this->get_feature_cards();
+				$bullet_star_url = Utils::get_asset_url( 'bulletStar.svg', $this->consent_manager_module_file );
+				?>
+				<div class="angie-feature-cards" data-testid="angie-feature-cards">
+					<?php foreach ( $feature_cards as $card ) : ?>
+						<div class="angie-feature-card">
+							<div class="angie-feature-card-header">
+								<img src="<?php echo esc_url( $bullet_star_url ); ?>" alt="" class="angie-feature-card-bullet" />
+								<h5 class="angie-feature-card-title"><?php echo esc_html( $card['title'] ); ?></h5>
+							</div>
+							<div class="angie-feature-card-body">
+								<p class="angie-feature-card-description"><?php echo esc_html( $card['description'] ); ?></p>
+							</div>
+						</div>
+					<?php endforeach; ?>
 				</div>
 			</div>
 		</div>
@@ -263,7 +288,7 @@ class Consent_Page {
 		// Enqueue styles
 		wp_enqueue_style(
 			'angie-consent-page',
-			Utils::get_asset_url( 'consent-page-styles.css', __DIR__ ),
+			Utils::get_asset_url( 'consent-page-styles.css', $this->consent_manager_module_file ),
 			[],
 			ANGIE_VERSION
 		);
@@ -314,5 +339,22 @@ class Consent_Page {
 			});
 		</script>
 		<?php
+	}
+
+	private function get_feature_cards() {
+		return [
+			[
+				'title'       => esc_html__( 'Describe what you want', 'angie' ),
+				'description' => esc_html__( 'Use plain language, a screenshot, or a URL to describe your vision.', 'angie' ),
+			],
+			[
+				'title'       => esc_html__( 'Angie builds it', 'angie' ),
+				'description' => esc_html__( 'Get ready-to-use assets, from Elementor widgets to WordPress snippets.', 'angie' ),
+			],
+			[
+				'title'       => esc_html__( 'Review before it goes live', 'angie' ),
+				'description' => esc_html__( 'Built in test mode first, so your website stays safe and you stay in control.', 'angie' ),
+			],
+		];
 	}
 }

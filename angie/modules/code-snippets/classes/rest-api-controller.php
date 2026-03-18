@@ -50,7 +50,17 @@ class Rest_Api_Controller {
 							'type'              => 'string',
 							'sanitize_callback' => 'sanitize_text_field',
 						],
+					'artifact_id' => [
+						'required'          => false,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
 					],
+					'version' => [
+						'required'          => false,
+						'type'              => 'integer',
+						'sanitize_callback' => 'absint',
+					],
+				],
 				],
 			]
 		);
@@ -106,6 +116,65 @@ class Rest_Api_Controller {
 						],
 						'type' => [
 							'required' => false,
+							'type' => 'string',
+							'sanitize_callback' => 'sanitize_text_field',
+						],
+					],
+				],
+			]
+		);
+
+		register_rest_route(
+			self::NAMESPACE,
+			'/artifacts/(?P<artifact_id>[a-f0-9\-]+)/files',
+			[
+				[
+					'methods' => 'PUT, PATCH',
+					'callback' => [ $this, 'update_snippet_files_by_artifact' ],
+					'permission_callback' => [ $this, 'check_permission' ],
+					'args' => [
+						'artifact_id' => [
+							'required' => true,
+							'type' => 'string',
+							'sanitize_callback' => 'sanitize_text_field',
+						],
+						'files' => [
+							'required' => true,
+							'type' => 'array',
+						],
+						'version' => [
+							'required' => false,
+							'type' => 'integer',
+							'sanitize_callback' => 'absint',
+						],
+					],
+				],
+			]
+		);
+
+		register_rest_route(
+			self::NAMESPACE,
+			'/artifacts/(?P<artifact_id>[a-f0-9\-]+)',
+			[
+				[
+					'methods' => \WP_REST_Server::DELETABLE,
+					'callback' => [ $this, 'delete_snippet_by_artifact' ],
+					'permission_callback' => [ $this, 'check_permission' ],
+					'args' => [
+						'artifact_id' => [
+							'required' => true,
+							'type' => 'string',
+							'sanitize_callback' => 'sanitize_text_field',
+						],
+					],
+				],
+				[
+					'methods' => \WP_REST_Server::EDITABLE,
+					'callback' => [ $this, 'publish_snippet_by_artifact' ],
+					'permission_callback' => [ $this, 'check_permission' ],
+					'args' => [
+						'artifact_id' => [
+							'required' => true,
 							'type' => 'string',
 							'sanitize_callback' => 'sanitize_text_field',
 						],
@@ -637,26 +706,7 @@ class Rest_Api_Controller {
 			);
 		}
 
-		$environments = [ Dev_Mode_Manager::ENV_DEV, Dev_Mode_Manager::ENV_PROD ];
-		File_System_Handler::delete_snippet_files( $post->ID, $environments );
-
-		$result = Snippet_Repository::delete_snippet( $post->ID );
-
-		if ( ! $result ) {
-			return new \WP_Error(
-				'delete_failed',
-				esc_html__( 'Failed to delete snippet.', 'angie' ),
-				[ 'status' => 500 ]
-			);
-		}
-
-		Cache_Manager::clear_published_snippet_cache();
-
-		return rest_ensure_response( [
-			'success' => true,
-			'message' => esc_html__( 'Snippet deleted successfully.', 'angie' ),
-			'post_id' => $post->ID,
-		] );
+		return $this->perform_delete( $post );
 	}
 
 	public function set_dev_mode( $request ) {
@@ -700,30 +750,13 @@ class Rest_Api_Controller {
 			);
 		}
 
-		$files = Snippet_Repository::get_snippet_files( $post->ID );
-
-		if ( empty( $files ) ) {
-			return new \WP_Error(
-				'no_files',
-				esc_html__( 'Snippet has no files to publish.', 'angie' ),
-				[ 'status' => 400 ]
-			);
-		}
-
-		File_System_Handler::write_snippet_files_to_disk( Dev_Mode_Manager::ENV_PROD, $post->ID, $files );
-		Cache_Manager::clear_published_snippet_cache();
-
-		return rest_ensure_response( [
-			'success' => true,
-			'message' => esc_html__( 'Snippet published to production successfully.', 'angie' ),
-			'post_id' => $post->ID,
-			'files'   => count( $files ),
-		] );
+		return $this->perform_publish( $post );
 	}
 
 	public function create_snippet_post( $request ) {
 		$title = $request->get_param( 'title' );
 		$type = $request->get_param( 'type' );
+		$artifact_id = $request->get_param( 'artifact_id' );
 
 		if ( empty( $title ) ) {
 			return new \WP_Error(
@@ -757,6 +790,15 @@ class Rest_Api_Controller {
 
 		if ( ! empty( $type ) ) {
 			wp_set_object_terms( $post_id, $type, Taxonomy_Manager::TAXONOMY_NAME );
+		}
+
+		if ( ! empty( $artifact_id ) ) {
+			update_post_meta( $post_id, '_angie_snippet_artifact_id', $artifact_id );
+		}
+
+		$version = $request->get_param( 'version' );
+		if ( ! empty( $version ) ) {
+			update_post_meta( $post_id, '_angie_snippet_version', $version );
 		}
 
 		return rest_ensure_response( [
@@ -823,6 +865,71 @@ class Rest_Api_Controller {
 		] );
 	}
 
+	public function delete_snippet_by_artifact( $request ) {
+		$post = $this->resolve_snippet_post_by_artifact( $request );
+
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
+		return $this->perform_delete( $post );
+	}
+
+	public function publish_snippet_by_artifact( $request ) {
+		$post = $this->resolve_snippet_post_by_artifact( $request );
+
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
+		return $this->perform_publish( $post );
+	}
+
+	public function update_snippet_files_by_artifact( $request ) {
+		$post = $this->resolve_snippet_post_by_artifact( $request );
+
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
+		$artifact_id = $request->get_param( 'artifact_id' );
+
+		$files = $request->get_param( 'files' );
+
+		$existing_files = Snippet_Repository::get_snippet_files_by_post( $post );
+		$merged_files = Snippet_Repository::merge_snippet_files( $existing_files, $files );
+
+		$sanitized_files = $this->sanitize_uploaded_files( $merged_files );
+		if ( is_wp_error( $sanitized_files ) ) {
+			return $sanitized_files;
+		}
+
+		if ( ! Snippet_Repository::has_main_php_file( $sanitized_files ) ) {
+			return new \WP_Error(
+				'main_php_required',
+				esc_html__( 'Snippet must have a main.php file.', 'angie' ),
+				[ 'status' => 400 ]
+			);
+		}
+
+		$version = $request->get_param( 'version' );
+		if ( ! empty( $version ) ) {
+			update_post_meta( $post->ID, '_angie_snippet_version', $version );
+		}
+
+		Snippet_Repository::update_snippet_files( $post->ID, $sanitized_files );
+		File_System_Handler::write_snippet_files_to_disk( Dev_Mode_Manager::ENV_DEV, $post->ID, $sanitized_files );
+		Cache_Manager::clear_published_snippet_cache();
+
+		return rest_ensure_response( [
+			'success'     => true,
+			'message'     => esc_html__( 'Snippet files updated successfully.', 'angie' ),
+			'post_id'     => $post->ID,
+			'artifact_id' => $artifact_id,
+			'files'       => count( $sanitized_files ),
+		] );
+	}
+
 	private function resolve_snippet_post( $request ) {
 		$id = $request->get_param( 'id' );
 
@@ -831,6 +938,74 @@ class Rest_Api_Controller {
 		}
 
 		return Snippet_Repository::find_snippet_post_by_slug( $request->get_param( 'slug' ) );
+	}
+
+	private function perform_delete( $post ) {
+		$environments = [ Dev_Mode_Manager::ENV_DEV, Dev_Mode_Manager::ENV_PROD ];
+		File_System_Handler::delete_snippet_files( $post->ID, $environments );
+
+		$result = Snippet_Repository::delete_snippet( $post->ID );
+
+		if ( ! $result ) {
+			return new \WP_Error(
+				'delete_failed',
+				esc_html__( 'Failed to delete snippet.', 'angie' ),
+				[ 'status' => 500 ]
+			);
+		}
+
+		Cache_Manager::clear_published_snippet_cache();
+
+		return rest_ensure_response( [
+			'success' => true,
+			'message' => esc_html__( 'Snippet deleted successfully.', 'angie' ),
+			'post_id' => $post->ID,
+		] );
+	}
+
+	private function perform_publish( $post ) {
+		$files = Snippet_Repository::get_snippet_files( $post->ID );
+
+		if ( empty( $files ) ) {
+			return new \WP_Error(
+				'no_files',
+				esc_html__( 'Snippet has no files to publish.', 'angie' ),
+				[ 'status' => 400 ]
+			);
+		}
+
+		File_System_Handler::write_snippet_files_to_disk( Dev_Mode_Manager::ENV_PROD, $post->ID, $files );
+		Cache_Manager::clear_published_snippet_cache();
+
+		$terms = wp_get_object_terms( $post->ID, Taxonomy_Manager::TAXONOMY_NAME, [ 'fields' => 'slugs' ] );
+		$type = ( ! is_wp_error( $terms ) && ! empty( $terms ) ) ? $terms[0] : null;
+
+		return rest_ensure_response( [
+			'success' => true,
+			'message' => esc_html__( 'Snippet published to production successfully.', 'angie' ),
+			'post_id' => $post->ID,
+			'type'    => $type,
+			'files'   => count( $files ),
+		] );
+	}
+
+	private function resolve_snippet_post_by_artifact( $request ) {
+		$artifact_id = $request->get_param( 'artifact_id' );
+		$post = Snippet_Repository::find_snippet_post_by_artifact_id( $artifact_id );
+
+		if ( ! $post ) {
+			return new \WP_Error(
+				'snippet_not_found',
+				sprintf(
+					/* translators: %s: artifact ID */
+					esc_html__( 'No snippet found for artifact: %s', 'angie' ),
+					$artifact_id
+				),
+				[ 'status' => 404 ]
+			);
+		}
+
+		return $post;
 	}
 
 	private function sanitize_uploaded_files( $files ) {

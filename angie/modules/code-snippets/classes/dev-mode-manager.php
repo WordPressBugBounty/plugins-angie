@@ -233,7 +233,12 @@ class Dev_Mode_Manager {
 			$main_file = $snippet_dir . '/main.php';
 
 			if ( file_exists( $main_file ) && is_readable( $main_file ) ) {
-				require_once $main_file;
+				try {
+					require_once $main_file;
+				} catch ( \Throwable $e ) {
+					// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					error_log( '[Angie Snippets] Failed to load ' . $snippet_name . ': ' . $e->getMessage() );
+				}
 			}
 		}
 	}

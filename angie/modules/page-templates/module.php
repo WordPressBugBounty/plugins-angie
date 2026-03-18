@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Module extends Module_Base {
 
 	const TEMPLATE_ANGIE_SLUG = 'angie-canvas';
-	const TEMPLATE_ANGIE_NAME = 'Canvas (Angie)';
+	const TEMPLATE_ANGIE_NAME = 'Blank template (Angie)';
 
 	public function __construct() {
 		add_filter( 'get_block_templates', [ $this, 'add_canvas_template' ], 10, 3 );

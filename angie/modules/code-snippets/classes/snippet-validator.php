@@ -50,13 +50,24 @@ class Snippet_Validator {
 		}
 
 		$validate_url = self::get_loopback_url( 'angie/v1/snippets/validate' );
+		$headers = [
+			'Content-Type' => 'application/json',
+			'X-WP-Nonce'   => wp_create_nonce( 'wp_rest' ),
+		];
+
+		if ( isset( $_SERVER['PHP_AUTH_USER'] ) && isset( $_SERVER['PHP_AUTH_PW'] ) ) {
+			$headers['Authorization'] = 'Basic ' . base64_encode(
+				sanitize_text_field( wp_unslash( $_SERVER['PHP_AUTH_USER'] ) ) . ':' .
+				sanitize_text_field( wp_unslash( $_SERVER['PHP_AUTH_PW'] ) )
+			);
+		} elseif ( ! empty( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
+			$headers['Authorization'] = sanitize_text_field( wp_unslash( $_SERVER['HTTP_AUTHORIZATION'] ) );
+		}
+
 		$response = wp_remote_post(
 			$validate_url,
 			[
-				'headers' => [
-					'Content-Type' => 'application/json',
-					'X-WP-Nonce'   => wp_create_nonce( 'wp_rest' ),
-				],
+				'headers' => $headers,
 				'body'    => wp_json_encode( [ 'files' => $validation_files ] ),
 				'timeout' => 30,
 				'cookies' => $_COOKIE,

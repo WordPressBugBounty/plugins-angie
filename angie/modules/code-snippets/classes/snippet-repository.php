@@ -19,6 +19,24 @@ class Snippet_Repository {
 		return $post;
 	}
 
+	public static function find_snippet_post_by_artifact_id( $artifact_id ) {
+		$args = [
+			'post_type'      => Module::CPT_NAME,
+			'post_status'    => 'any',
+			'posts_per_page' => 1,
+			'meta_query'     => [
+				[
+					'key'   => '_angie_snippet_artifact_id',
+					'value' => sanitize_text_field( $artifact_id ),
+				],
+			],
+		];
+
+		$posts = get_posts( $args );
+
+		return ! empty( $posts ) ? $posts[0] : null;
+	}
+
 	public static function find_snippet_post_by_slug( $slug ) {
 		$args = [
 			'post_type'      => Module::CPT_NAME,
