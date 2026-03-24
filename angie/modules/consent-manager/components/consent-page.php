@@ -55,7 +55,7 @@ class Consent_Page {
 		// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- External Google Fonts resource, version not applicable
 		wp_enqueue_style(
 			'angie-google-fonts',
-			'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap',
+			'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap',
 			[],
 			null
 		);

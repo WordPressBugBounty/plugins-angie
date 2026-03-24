@@ -87,7 +87,7 @@ class Angie_App {
 		// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- External Google Fonts resource, version not applicable
 		wp_enqueue_style(
 			'angie-google-fonts',
-			'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap',
+			'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap',
 			[],
 			null
 		);
@@ -242,41 +242,18 @@ class Angie_App {
 		</style>
 
 		<?php if ( ConsentManager::has_consent() ) : ?>
-			<div class="angie-app-page" data-testid="angie-app-page">
-				<div class="angie-app-layout" data-testid="angie-app-layout">
-						<div class="angie-app-start" id="angie-app-start" data-testid="angie-app-start">
-						<h4>
-							<?php esc_html_e( 'Let\'s build something new with Angie', 'angie' ); ?><br>
-						</h4>
-						<p><?php esc_html_e( 'Generate custom Elementor widgets, forms, layouts, and code snippets tailored to your site.', 'angie' ); ?><br><?php esc_html_e( 'Scale your capabilities and experiment freely. Everything is editable and nothing goes live until you approve.', 'angie' ); ?></p>
-					<?php if ( $is_in_oauth_flow ) : ?>
-							<div class="angie-loading-state" data-testid="angie-loading-state">
-								<div class="angie-spinner"></div>
-								<p class="angie-loading-text">
-									<?php
-									if ( $is_oauth_starting && ! $is_oauth_return ) {
-										esc_html_e( 'Redirecting to sign in...', 'angie' );
-									} else {
-										esc_html_e( 'Completing authentication...', 'angie' );
-									}
-									?>
-								</p>
-							</div>
-						<?php endif; ?>
-					</div>
-
-						<div class="angie-app-end" data-testid="angie-app-end">
-						<div class="angie-end-container" data-testid="angie-end-container">
-							<img src="<?php echo esc_url( Utils::get_asset_url( 'askAngieImage.png', __DIR__ ) ); ?>"
-								alt="<?php esc_attr_e( 'Ask Angie AI Assistant', 'angie' ); ?>"
-								class="angie-ask-image" data-testid="angie-ask-image" />
-						</div>
-					</div>
+			<?php if ( $is_in_oauth_flow ) : ?>
+				<div class="angie-loading-state" data-testid="angie-loading-state">
+					<?php if ( $is_oauth_return ) : ?>
+						<p><?php esc_html_e( 'Completing authentication...', 'angie' ); ?></p>
+					<?php else : ?>
+						<p><?php esc_html_e( 'Redirecting to sign in...', 'angie' ); ?></p>
+					<?php endif; ?>
 				</div>
-			</div>
-
-			<?php $this->render_app_styles(); ?>
-
+			<?php else : ?>
+				<div class="angie-app-page" data-testid="angie-app-page"></div>
+				<?php $this->render_app_styles(); ?>
+			<?php endif; ?>
 		<?php else : ?>
 			<div class="wrap">
 				<div class="angie-consent-required">
