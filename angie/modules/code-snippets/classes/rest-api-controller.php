@@ -12,6 +12,7 @@ class Rest_Api_Controller {
 	const NAMESPACE = 'angie/v1';
 	const MAX_FILES_PER_REQUEST = 100;
 	const MAX_FILE_SIZE_BYTES = 102400;
+	const ERROR_ARTIFACT_SNIPPET_EXISTS = 'artifact_snippet_exists';
 
 	public function register_routes() {
 		register_rest_route(
@@ -776,6 +777,21 @@ class Rest_Api_Controller {
 				),
 				[ 'status' => 400 ]
 			);
+		}
+
+		if ( ! empty( $artifact_id ) ) {
+			$existing = Snippet_Repository::find_snippet_post_by_artifact_id( $artifact_id );
+			if ( $existing ) {
+				return new \WP_Error(
+					self::ERROR_ARTIFACT_SNIPPET_EXISTS,
+					sprintf(
+						/* translators: %s: artifact ID */
+						esc_html__( 'A snippet already exists for artifact ID %s.', 'angie' ),
+						$artifact_id
+					),
+					[ 'status' => 409 ]
+				);
+			}
 		}
 
 		$post_id = Snippet_Repository::create_snippet( $title );

@@ -1,6 +1,9 @@
 .angie-app-page {
 	font-family: Roboto;
 	box-sizing: border-box;
+	inset-inline-end: 2%;
+	width: 102%;
+	position: relative;
 }
 
 .angie-app-end {

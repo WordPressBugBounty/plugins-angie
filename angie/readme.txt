@@ -1,16 +1,16 @@
-=== Angie - Agentic AI for WordPress (Beta) ===
+=== Angie - Agentic AI (Beta) ===
 Contributors: elemntor
 Tags: ai, artificial intelligence, elementor, assistant, automation
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.3
+Stable tag: 1.1.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 == Description ==
 
-Angie Code: Your expert WordPress developer, powered by AI. Build anything you can imagine without writing a single line of code.
+**Angie Code:** Your expert WordPress developer, powered by AI. Build anything you can imagine without writing a single line of code.
 
 **Disclaimer:** Angie is currently in Beta. While core functionality within WordPress and the Elementor Editor is stable and ready to explore, some actions and integrations with third-party tools are still evolving. We are continuously refining Angie's capabilities and expanding its capabilities. Please ensure you back up your site before use. During this Beta phase, enjoy free daily credits and help us shape the future of AI-driven web creation with your feedback.
 
@@ -53,7 +53,7 @@ Stop compromising your vision. Start building with Angie.
 
 == Contributors & Developers ==
 
-"Angie: Agentic AI for WordPress" is open source software. The following people have contributed to this plugin.
+"Angie: Agentic AI" is open source software. The following people have contributed to this plugin.
 
 Contributors: Elementor
 
@@ -160,6 +160,10 @@ Not at all. Angie is built for creators worldwide. You can prompt Angie in your 
 Language should never be a barrier to bringing your WordPress ideas to life.
 
 == Changelog ==
+
+= 1.1.4 - 2026-03-26 =
+* Tweak: Changed plugin tagline and readme file
+* Fix: Avoid creating duplicate snippets in certain cases using Angie code
 
 = 1.1.3 - 2026-03-24 =
 * Tweak: Improved Angie Home screen to include visual use cases
