@@ -37,6 +37,7 @@ class Sidebar_HTML {
 				const MIN_WIDTH = 310 + SIDE_MENU_WIDTH;
 				const MAX_WIDTH = 550 + SIDE_MENU_WIDTH;
 				const DEFAULT_WIDTH = 330 + SIDE_MENU_WIDTH;
+				const ANGIE_PAGE_SLUG = 'angie-app';
 
 				var defaultState = '" . esc_js( $default_state ) . "';
 				var savedState = null;
@@ -64,9 +65,20 @@ class Sidebar_HTML {
 				const isInOAuthFlow = urlParams.has('start-oauth') || 
 					urlParams.has('oauth_code') || 
 					urlParams.has('oauth_state') || 
+					urlParams.has('oauth2_login_success') ||
+					urlParams.has('oauth2_state') ||
 					urlParams.has('oauth_error');
 
-				var shouldBeOpen = (savedState || defaultState) === 'open' && !isIframe && !isInOAuthFlow;
+				let isOAuthGuardActive = false;
+				try {
+					isOAuthGuardActive = sessionStorage.getItem('angie_oauth_guard_active') === '1';
+				} catch (e) {
+					console.debug('Angie Sidebar: sessionStorage unavailable in sidebar-html', e);
+				}
+
+				const isAngieOAuthPage = urlParams.get('page') === ANGIE_PAGE_SLUG && ( isInOAuthFlow || isOAuthGuardActive );
+
+				var shouldBeOpen = (savedState || defaultState) === 'open' && !isIframe && !( isInOAuthFlow || isAngieOAuthPage );
 
 				function applyAngieClasses() {
 					const topPadding = document.getElementById('angie-body-top-padding');

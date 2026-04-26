@@ -25,7 +25,6 @@ class Angie_App {
 		add_action( 'admin_menu', [ $this, 'register_admin_menu' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ], 1 );
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ], 1 );
-		add_filter( 'body_class', [ $this, 'add_angie_body_class' ] );
 	}
 
 	/**
@@ -278,10 +277,5 @@ class Angie_App {
 			[],
 			ANGIE_VERSION
 		);
-	}
-
-	public function add_angie_body_class( $classes ) {
-		$classes[] = 'angie-default';
-		return $classes;
 	}
 }

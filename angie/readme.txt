@@ -4,7 +4,7 @@ Tags: ai, artificial intelligence, elementor, assistant, automation
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.4
+Stable tag: 1.1.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -160,6 +160,13 @@ Not at all. Angie is built for creators worldwide. You can prompt Angie in your 
 Language should never be a barrier to bringing your WordPress ideas to life.
 
 == Changelog ==
+
+= 1.1.5 - 2026-04-26 =
+* Tweak: Update snippet files to cloud artifacts upon snippet update
+* Tweak: Added Coming soon page for Angie Agents
+* Tweak: Improved error reporting for tool failures in code generation
+* Fix: Prevented Angie sidebar from auto-opening after OAuth login
+* Fix: Excluded trashed snippets from snippet results for better accuracy
 
 = 1.1.4 - 2026-03-26 =
 * Tweak: Changed plugin tagline and readme file

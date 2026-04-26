@@ -91,6 +91,16 @@ class Plugin {
 		}
 		$this->init();
 		$this->register_heartbeat_nonce_refresh();
+		$this->register_angie_default_body_class();
+	}
+
+	private function register_angie_default_body_class() {
+		add_filter( 'body_class', [ $this, 'filter_body_class_angie_default' ] );
+	}
+
+	public function filter_body_class_angie_default( $classes ) {
+		$classes[] = 'angie-default';
+		return $classes;
 	}
 
 	private function register_heartbeat_nonce_refresh() {

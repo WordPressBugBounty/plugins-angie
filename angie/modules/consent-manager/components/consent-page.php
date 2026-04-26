@@ -3,7 +3,6 @@
 namespace Angie\Modules\ConsentManager\Components;
 
 use Angie\Modules\ConsentManager\Module as ConsentManager;
-use Angie\Modules\AngieApp\Components\Angie_App;
 use Angie\Includes\Utils;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -299,7 +298,6 @@ class Consent_Page {
 				const checkbox = document.getElementById('angie-terms-consent');
 				const button = document.getElementById('angie-signin-btn');
 				const hasConsent = <?php echo json_encode( get_option( ConsentManager::CONSENT_OPTION_NAME, 'no' ) === 'yes' ); ?>;
-				
 				let isProcessing = false;
 				
 				checkbox.addEventListener('change', function() {

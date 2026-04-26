@@ -12,6 +12,7 @@ class Files_Meta_Box {
 	public static function init() {
 		add_action( 'add_meta_boxes', [ __CLASS__, 'add_files_meta_box' ] );
 		add_action( 'save_post_' . Module::CPT_NAME, [ __CLASS__, 'save_files_meta' ] );
+		add_filter( 'angie_config', [ __CLASS__, 'add_artifact_sync_data' ] );
 	}
 
 	public static function add_files_meta_box() {
@@ -132,5 +133,59 @@ class Files_Meta_Box {
 		update_post_meta( $post_id, $meta_key, $files );
 
 		File_System_Handler::write_snippet_files_to_disk( Dev_Mode_Manager::ENV_DEV, $post_id, $files );
+
+		$artifact_id = get_post_meta( $post_id, '_angie_snippet_artifact_id', true );
+
+		if ( ! empty( $artifact_id ) ) {
+			$nonce = wp_create_nonce( 'angie_artifact_sync_' . $post_id );
+			add_filter( 'redirect_post_location', function ( $location ) use ( $artifact_id, $nonce ) {
+				return add_query_arg( [
+					'artifact_updated'  => '1',
+					'artifact_id'       => $artifact_id,
+					'_artifact_nonce'   => $nonce,
+				], $location );
+			} );
+		}
+	}
+
+	public static function add_artifact_sync_data( $config ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( empty( $_GET['artifact_updated'] ) || empty( $_GET['artifact_id'] ) ) {
+			return $config;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$post_id = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
+
+		if ( ! $post_id ) {
+			return $config;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! isset( $_GET['_artifact_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_artifact_nonce'] ) ), 'angie_artifact_sync_' . $post_id ) ) {
+			return $config;
+		}
+
+		$post = Snippet_Repository::find_snippet_post_by_id( $post_id );
+
+		if ( ! $post ) {
+			return $config;
+		}
+
+		$files = Snippet_Repository::get_snippet_files_by_post( $post );
+
+		$config['artifactSyncData'] = [
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			'artifactId' => sanitize_text_field( wp_unslash( $_GET['artifact_id'] ) ),
+			'title'      => $post->post_title,
+			'files'      => array_map( function ( $file ) {
+				return [
+					'name'    => $file['name'],
+					'content' => $file['content'],
+				];
+			}, $files ),
+		];
+
+		return $config;
 	}
 }

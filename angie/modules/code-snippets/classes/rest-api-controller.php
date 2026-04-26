@@ -87,6 +87,30 @@ class Rest_Api_Controller {
 
 		register_rest_route(
 			self::NAMESPACE,
+			'/artifacts/(?P<artifact_id>[a-f0-9\-]+)/rename',
+			[
+				[
+					'methods' => \WP_REST_Server::EDITABLE,
+					'callback' => [ $this, 'rename_snippet_by_artifact' ],
+					'permission_callback' => [ $this, 'check_permission' ],
+					'args' => [
+						'artifact_id' => [
+							'required' => true,
+							'type' => 'string',
+							'sanitize_callback' => 'sanitize_text_field',
+						],
+						'title' => [
+							'required' => true,
+							'type' => 'string',
+							'sanitize_callback' => 'sanitize_text_field',
+						],
+					],
+				],
+			]
+		);
+
+		register_rest_route(
+			self::NAMESPACE,
 			'/snippets/(?P<id>\d+)/files',
 			[
 				[
@@ -881,6 +905,16 @@ class Rest_Api_Controller {
 		] );
 	}
 
+	public function rename_snippet_by_artifact( $request ) {
+		$post = $this->resolve_snippet_post_by_artifact( $request );
+
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
+		return $this->perform_rename( $post, $request->get_param( 'title' ) );
+	}
+
 	public function delete_snippet_by_artifact( $request ) {
 		$post = $this->resolve_snippet_post_by_artifact( $request );
 
@@ -954,6 +988,28 @@ class Rest_Api_Controller {
 		}
 
 		return Snippet_Repository::find_snippet_post_by_slug( $request->get_param( 'slug' ) );
+	}
+
+	private function perform_rename( $post, $title ) {
+		$result = wp_update_post( [
+			'ID'         => $post->ID,
+			'post_title' => sanitize_text_field( $title ),
+		], true );
+
+		if ( is_wp_error( $result ) ) {
+			return new \WP_Error(
+				'rename_failed',
+				esc_html__( 'Failed to rename snippet.', 'angie' ),
+				[ 'status' => 500 ]
+			);
+		}
+
+		return rest_ensure_response( [
+			'success' => true,
+			'message' => esc_html__( 'Snippet renamed successfully.', 'angie' ),
+			'post_id' => $post->ID,
+			'title'   => $title,
+		] );
 	}
 
 	private function perform_delete( $post ) {

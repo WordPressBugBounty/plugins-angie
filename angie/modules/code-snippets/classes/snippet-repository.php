@@ -22,7 +22,7 @@ class Snippet_Repository {
 	public static function find_snippet_post_by_artifact_id( $artifact_id ) {
 		$args = [
 			'post_type'      => Module::CPT_NAME,
-			'post_status'    => 'any',
+			'post_status'    => [ 'publish', 'draft' ],
 			'posts_per_page' => 1,
 			'meta_query'     => [
 				[
@@ -40,7 +40,7 @@ class Snippet_Repository {
 	public static function find_snippet_post_by_slug( $slug ) {
 		$args = [
 			'post_type'      => Module::CPT_NAME,
-			'post_status'    => 'any',
+			'post_status'    => [ 'publish', 'draft' ],
 			'posts_per_page' => 1,
 			'title'          => $slug,
 		];
@@ -50,7 +50,7 @@ class Snippet_Repository {
 		if ( empty( $posts ) ) {
 			$args = [
 				'post_type'      => Module::CPT_NAME,
-				'post_status'    => 'any',
+				'post_status'    => [ 'publish', 'draft' ],
 				'posts_per_page' => 1,
 				'name'           => $slug,
 			];
@@ -111,7 +111,7 @@ class Snippet_Repository {
 	public static function get_all_snippets( $type = null ) {
 		$args = [
 			'post_type'      => Module::CPT_NAME,
-			'post_status'    => 'any',
+			'post_status'    => [ 'publish', 'draft' ],
 			'posts_per_page' => -1,
 			'orderby'        => 'title',
 			'order'          => 'ASC',
@@ -148,6 +148,9 @@ class Snippet_Repository {
 		$timestamps = Dev_Mode_Manager::get_snippet_environment_timestamps( $post->ID );
 		$is_elementor_widget = ! is_wp_error( $terms ) && in_array( 'elementor-widget', $terms, true );
 
+		$artifact_id = get_post_meta( $post->ID, '_angie_snippet_artifact_id', true );
+		$version = get_post_meta( $post->ID, '_angie_snippet_version', true );
+
 		$data = [
 			'id'                => $post->ID,
 			'slug'              => self::get_snippet_slug_from_post( $post ),
@@ -156,6 +159,9 @@ class Snippet_Repository {
 			'types'             => $types,
 			'files'             => self::build_file_list( $files ),
 			'deploymentStatus'  => $timestamps['status'],
+			'artifactId'        => $artifact_id ? $artifact_id : null,
+			'version'           => $version ? (int) $version : null,
+			'createdAt'         => $post->post_date_gmt,
 		];
 
 		if ( $is_elementor_widget ) {

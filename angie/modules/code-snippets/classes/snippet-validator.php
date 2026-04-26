@@ -98,7 +98,12 @@ class Snippet_Validator {
 			$error_message = $validation_result['data']['error']['message']
 				?? $validation_result['data']['details']['message']
 				?? $validation_result['message']
-				?? esc_html__( 'Unknown validation error.', 'angie' );
+				?? sprintf(
+					/* translators: 1: HTTP status code, 2: truncated response body */
+					esc_html__( 'Loopback validation returned HTTP %1$s: %2$s', 'angie' ),
+					$response_code,
+					mb_substr( wp_strip_all_tags( $response_body ), 0, 200, 'UTF-8' )
+				);
 
 			return new \WP_Error(
 				'validation_failed',

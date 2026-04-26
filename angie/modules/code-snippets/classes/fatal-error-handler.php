@@ -27,7 +27,7 @@ class Fatal_Error_Handler {
 		$prompt = $snippet_id
 			? 'Please fix the error in snippet ID ' . $snippet_id . ' - Use the snippet slug: ' . $error_message
 			: 'Please fix this error: ' . $error_message;
-		$fix_with_angie_url = $exit_url . '#angie-prompt=' . rawurlencode( $prompt );
+		$fix_with_angie_url = $exit_url . '#angie-prompt=' . rawurlencode( $prompt ) . '&angie-new-chat=true';
 
 		ob_start();
 		?>

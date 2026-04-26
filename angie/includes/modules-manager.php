@@ -19,6 +19,7 @@ final class Manager {
 			'AngieApp', // must be first for admin menu.
 			'ElementorCore',
 			'ConsentManager',
+			'AngieAgents',
 			'AcfRestApi',
 			'ThemeManager',
 			'PluginManager',
