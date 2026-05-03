@@ -1,10 +1,10 @@
 === Angie - Agentic AI (Beta) ===
 Contributors: elemntor
-Tags: ai, artificial intelligence, elementor, assistant, automation
+Tags: ai, agent, elementor, assistant, mcp
 Requires at least: 6.2
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.1.5
+Stable tag: 1.1.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -17,6 +17,8 @@ License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Angie Code lets professional web creators and agencies create custom Elementor widgets, snippets for WordPress, and functionality instantly. Simply describe what you need, and watch Angie build production-ready code in seconds, zero coding knowledge required.
 
 While standard solutions provide a vital foundation for most project requirements, Angie Code eliminates the compromise of "close enough", empowering you to build the bespoke functionalities that define the final, most impactful details of your site ensuring every element meets your exact specifications with technical precision.
+
+Explore the [prompt library](https://prompts.elementor.com/?utm_source=wp-repo) for more examples.
 
 == Fully configurable inside WordPress & Elementor ==
 
@@ -149,9 +151,9 @@ Yes. Angie is fully extensible. Developers can use Angie's official SDK on GitHu
 
 Resources:
 
-- GitHub SDK
-- NPM package
-- Demo plugin
+- [GitHub SDK](https://github.com/elementor/angie-sdk/)
+- [NPM package](https://www.npmjs.com/package/@elementor/angie-sdk)
+- [Demo plugin](https://github.com/elementor/angie-sdk/tree/master/example/angie-demo-plugin)
 
 = 12. Do I need to speak English to use Angie? =
 
@@ -160,6 +162,11 @@ Not at all. Angie is built for creators worldwide. You can prompt Angie in your 
 Language should never be a barrier to bringing your WordPress ideas to life.
 
 == Changelog ==
+
+= 1.1.6 - 2026-05-03 =
+* Tweak: Updated Angie admin submenu items order and terms
+* Tweak: Updated copy in "Agents" screen
+* Tweak: Set sidebar state to closed by default on Angie home screen
 
 = 1.1.5 - 2026-04-26 =
 * Tweak: Update snippet files to cloud artifacts upon snippet update

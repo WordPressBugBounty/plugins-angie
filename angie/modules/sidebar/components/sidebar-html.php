@@ -23,7 +23,7 @@ class Sidebar_HTML {
 		$is_rtl = is_rtl();
 		$dir_attr = $is_rtl ? 'dir="rtl"' : 'dir="ltr"';
 
-		$default_state = get_option( 'angie_sidebar_default_state', 'open' );
+		$default_state = get_option( 'angie_sidebar_default_state', 'closed' );
 		$is_open = 'open' === $default_state;
 		$hidden = $is_open ? 'false' : 'true';
 

@@ -31,7 +31,7 @@ class Agents_Page {
 			'manage_options',
 			'angie-agents',
 			[ $this, 'render_agents_page' ],
-			20
+			2
 		);
 	}
 
@@ -86,10 +86,12 @@ class Agents_Page {
 					<span class="angie-agents-logo-text"><?php esc_html_e( 'angie', 'angie' ); ?></span>
 				</div>
 				<h1 class="angie-agents-headline">
-					<?php esc_html_e( 'Agents are launching ', 'angie' ); ?><span class="angie-agents-headline-soon"><?php esc_html_e( 'soon', 'angie' ); ?></span>
+					<?php esc_html_e( 'Agents are coming ', 'angie' ); ?><span class="angie-agents-headline-soon"><?php esc_html_e( 'soon', 'angie' ); ?></span>
 				</h1>
 				<p class="angie-agents-subtitle">
-					<?php esc_html_e( 'Angie will soon support AI agents that can automate tasks across your website.', 'angie' ); ?>
+					<?php esc_html_e( 'Run agents powered by real WordPress expertise and full context of your site.', 'angie' ); ?>
+					<br />
+					<?php esc_html_e( 'More gets done while your attention stays where it belongs.', 'angie' ); ?>
 				</p>
 				<button class="angie-agents-notify-btn" type="button" id="angie-agents-notify-btn">
 					<?php esc_html_e( "Notify me when it's ready", 'angie' ); ?>

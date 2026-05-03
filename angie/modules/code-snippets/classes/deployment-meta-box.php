@@ -37,7 +37,9 @@ class Deployment_Meta_Box {
 
 		wp_add_inline_style(
 			'angie-list-table-toggle',
-			'#misc-publishing-actions .misc-pub-section:not(.angie-publish-toggle) { display: none !important; }'
+			'#misc-publishing-actions .misc-pub-section:not(.angie-publish-toggle) { display: none !important; }
+.angie-publish-toggle { display: flex !important; align-items: center; gap: 8px; padding: 6px 10px; }
+.angie-publish-toggle[hidden] { display: none !important; }'
 		);
 	}
 
@@ -54,6 +56,7 @@ class Deployment_Meta_Box {
 		$config['deploymentMetaBox'] = [
 			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 			'nonce'   => wp_create_nonce( 'angie_toggle_snippet_status' ),
+			'artifactId' => get_post_meta( get_the_ID(), '_angie_snippet_artifact_id', true ),
 		];
 
 		return $config;
@@ -67,7 +70,7 @@ class Deployment_Meta_Box {
 		$is_published = 'publish' === $post->post_status;
 		$checked      = $is_published ? 'checked' : '';
 
-		echo '<div class="misc-pub-section angie-publish-toggle" style="display: flex !important; align-items: center; gap: 8px; padding: 6px 10px;">';
+		echo '<div class="misc-pub-section angie-publish-toggle">';
 		echo '<strong>' . esc_html__( 'Status:', 'angie' ) . '</strong>';
 		printf(
 			'<label class="angie-snippet-toggle">

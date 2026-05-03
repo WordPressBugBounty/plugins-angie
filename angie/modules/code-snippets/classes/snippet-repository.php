@@ -37,29 +37,6 @@ class Snippet_Repository {
 		return ! empty( $posts ) ? $posts[0] : null;
 	}
 
-	public static function find_snippet_post_by_slug( $slug ) {
-		$args = [
-			'post_type'      => Module::CPT_NAME,
-			'post_status'    => [ 'publish', 'draft' ],
-			'posts_per_page' => 1,
-			'title'          => $slug,
-		];
-
-		$posts = get_posts( $args );
-
-		if ( empty( $posts ) ) {
-			$args = [
-				'post_type'      => Module::CPT_NAME,
-				'post_status'    => [ 'publish', 'draft' ],
-				'posts_per_page' => 1,
-				'name'           => $slug,
-			];
-			$posts = get_posts( $args );
-		}
-
-		return ! empty( $posts ) ? $posts[0] : null;
-	}
-
 	public static function get_snippet_slug_from_post( $post ) {
 		$slug = sanitize_title( $post->post_title );
 		if ( empty( $slug ) ) {

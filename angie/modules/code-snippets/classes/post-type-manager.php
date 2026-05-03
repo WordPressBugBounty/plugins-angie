@@ -27,12 +27,12 @@ class Post_Type_Manager {
 			'search_items' => esc_html__( 'Search Angie Snippets', 'angie' ),
 			'not_found' => esc_html__( 'No snippets found', 'angie' ),
 			'not_found_in_trash' => esc_html__( 'No snippets found in Trash', 'angie' ),
-			'all_items' => esc_html__( 'Snippets', 'angie' ),
+			'all_items' => esc_html__( 'Code Snippets', 'angie' ),
 			'archives' => esc_html__( 'Angie Snippets', 'angie' ),
 			'attributes' => esc_html__( 'Snippet Attributes', 'angie' ),
 			'insert_into_item' => esc_html__( 'Insert into snippet', 'angie' ),
 			'uploaded_to_this_item' => esc_html__( 'Uploaded to this snippet', 'angie' ),
-			'menu_name' => esc_html__( 'Snippets', 'angie' ),
+			'menu_name' => esc_html__( 'Code Snippets', 'angie' ),
 			'name_admin_bar' => esc_html__( 'Angie Snippet', 'angie' ),
 		];
 
