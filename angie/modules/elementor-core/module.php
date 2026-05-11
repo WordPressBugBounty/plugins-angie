@@ -53,7 +53,7 @@ class Module extends Module_Base {
 		$elements_manager->add_category(
 			'angie-widgets',
 			[
-				'title' => esc_html__( 'Angie Widgets', 'angie' ),
+				'title' => esc_html__( 'Custom widgets', 'angie' ),
 				'icon' => 'eicon-ai',
 				'hideIfEmpty' => false,
 				'active' => true,
@@ -64,8 +64,7 @@ class Module extends Module_Base {
 	public function render_angie_category_generate_button() {
 		?><# if ( 'angie-widgets' === name ) { #>
 		<span class="angie-category-generate" data-angie-generate-widget style="display: inline-flex; align-items: center; gap: 4px; margin-inline-start: auto; color: #C00BB9; color: light-dark(#C00BB9, #F0ABFC); font-size: 12px; font-weight: 500; cursor: pointer;">
-			<i class="eicon-ai" aria-hidden="true" style="font-size: 14px;"></i>
-			<?php echo esc_html__( 'Generate', 'angie' ); ?>
+			<?php echo esc_html__( 'Create', 'angie' ); ?>
 		</span>
 		<# } #><?php
 	}
@@ -76,7 +75,7 @@ class Module extends Module_Base {
 		}
 		?><# if ( 'angie-widgets' === name ) { #>
 		<div class="angie-category-empty-state" data-angie-category-empty-state style="grid-column: 1 / -1; width: 100%; padding: 12px 20px;">
-			<p style="color: #A4AFB7; font-size: 12px; margin: 0; line-height: 1.4;"><?php echo esc_html__( 'Your generated widgets by Angie will show up here.', 'angie' ); ?></p>
+			<p style="color: #A4AFB7; font-size: 12px; margin: 0; line-height: 1.4;"><?php echo esc_html__( 'Create custom widgets by describing what you need.', 'angie' ); ?></p>
 		</div>
 		<# } #><?php
 	}

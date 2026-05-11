@@ -4,7 +4,7 @@ Tags: ai, agent, elementor, assistant, mcp
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.1.6
+Stable tag: 1.1.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -162,6 +162,15 @@ Not at all. Angie is built for creators worldwide. You can prompt Angie in your 
 Language should never be a barrier to bringing your WordPress ideas to life.
 
 == Changelog ==
+
+= 1.1.7 - 2026-05-11 =
+* Tweak: Updated Save to Cloud Library and Update Cloud Library labels based on cloud status
+* Tweak: Added ability to sync existing code snippets to Cloud Library
+* Tweak: Updated admin list page title for Code Snippets in Angie
+* Tweak: Updated copy for Angie widgets in the Editor
+* Tweak: Updated WordPress compatibility to version 7.0
+* Fix: Custom AI instructions could not be saved in Angie settings
+* Fix: "Edit with Angie" prompt uses wrong snippet ID
 
 = 1.1.6 - 2026-05-03 =
 * Tweak: Updated Angie admin submenu items order and terms

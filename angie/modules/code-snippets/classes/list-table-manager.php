@@ -174,15 +174,17 @@ class List_Table_Manager {
 
 		$post = get_post( $post_id );
 		$snippet_slug = $post ? $post->post_name : '';
+		$artifact_id = get_post_meta( $post_id, '_angie_snippet_artifact_id', true );
 
 		$disabled_attr = $is_deploy_button_disabled ? ' disabled' : '';
 		$deploy_action = ( $dev_time > 0 ) ? 'push-to-production' : 'publish-to-dev';
 		$button_text = ( $dev_time > 0 ) ? esc_html__( 'Push to Live', 'angie' ) : esc_html__( 'Push to Test', 'angie' );
 
 		printf(
-			'<button type="button" class="button angie-push-to-production" data-post-id="%d" data-snippet-slug="%s" data-action="%s"%s>%s</button>',
+			'<button type="button" class="button angie-push-to-production" data-post-id="%d" data-snippet-slug="%s" data-artifact-id="%s" data-action="%s"%s>%s</button>',
 			absint( $post_id ),
 			esc_attr( $snippet_slug ),
+			esc_attr( $artifact_id ),
 			esc_attr( $deploy_action ),
 			esc_attr( $disabled_attr ),
 			esc_html( $button_text )

@@ -16,19 +16,19 @@ class Post_Type_Manager {
 
 	public static function register_post_type() {
 		$labels = [
-			'name' => esc_html__( 'Angie Snippets', 'angie' ),
+			'name' => esc_html__( 'Angie Code Snippets', 'angie' ),
 			'singular_name' => esc_html__( 'Angie Snippet', 'angie' ),
 			'add_new' => esc_html__( 'Add New', 'angie' ),
 			'add_new_item' => esc_html__( 'Add New Angie Snippet', 'angie' ),
 			'edit_item' => esc_html__( 'Edit Angie Snippet', 'angie' ),
 			'new_item' => esc_html__( 'New Angie Snippet', 'angie' ),
 			'view_item' => esc_html__( 'View Angie Snippet', 'angie' ),
-			'view_items' => esc_html__( 'View Angie Snippets', 'angie' ),
-			'search_items' => esc_html__( 'Search Angie Snippets', 'angie' ),
+			'view_items' => esc_html__( 'View Angie Code Snippets', 'angie' ),
+			'search_items' => esc_html__( 'Search Angie Code Snippets', 'angie' ),
 			'not_found' => esc_html__( 'No snippets found', 'angie' ),
 			'not_found_in_trash' => esc_html__( 'No snippets found in Trash', 'angie' ),
 			'all_items' => esc_html__( 'Code Snippets', 'angie' ),
-			'archives' => esc_html__( 'Angie Snippets', 'angie' ),
+			'archives' => esc_html__( 'Angie Code Snippets', 'angie' ),
 			'attributes' => esc_html__( 'Snippet Attributes', 'angie' ),
 			'insert_into_item' => esc_html__( 'Insert into snippet', 'angie' ),
 			'uploaded_to_this_item' => esc_html__( 'Uploaded to this snippet', 'angie' ),

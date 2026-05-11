@@ -129,16 +129,17 @@ class Snippet_Repository {
 		$version = get_post_meta( $post->ID, '_angie_snippet_version', true );
 
 		$data = [
-			'id'                => $post->ID,
-			'slug'              => self::get_snippet_slug_from_post( $post ),
-			'title'             => $post->post_title,
-			'status'            => $post->post_status,
-			'types'             => $types,
-			'files'             => self::build_file_list( $files ),
-			'deploymentStatus'  => $timestamps['status'],
-			'artifactId'        => $artifact_id ? $artifact_id : null,
-			'version'           => $version ? (int) $version : null,
-			'createdAt'         => $post->post_date_gmt,
+			'id'                    => $post->ID,
+			'slug'                  => self::get_snippet_slug_from_post( $post ),
+			'title'                 => $post->post_title,
+			'status'                => $post->post_status,
+			'types'                 => $types,
+			'files'                 => self::build_file_list( $files ),
+			'deploymentStatus'      => $timestamps['status'],
+			'artifactId'            => $artifact_id ? $artifact_id : null,
+			'version'               => $version ? (int) $version : null,
+			'createdAt'             => $post->post_date_gmt,
+			'isOwnedByCurrentUser'  => (int) $post->post_author === get_current_user_id(),
 		];
 
 		if ( $is_elementor_widget ) {

@@ -111,6 +111,30 @@ class Rest_Api_Controller {
 
 		register_rest_route(
 			self::NAMESPACE,
+			'/snippets/(?P<id>\d+)/artifact',
+			[
+				[
+					'methods' => \WP_REST_Server::EDITABLE,
+					'callback' => [ $this, 'link_artifact_to_snippet' ],
+					'permission_callback' => [ $this, 'check_permission' ],
+					'args' => [
+						'id' => [
+							'required' => true,
+							'type' => 'integer',
+							'sanitize_callback' => 'absint',
+						],
+						'artifact_id' => [
+							'required' => true,
+							'type' => 'string',
+							'sanitize_callback' => 'sanitize_text_field',
+						],
+					],
+				],
+			]
+		);
+
+		register_rest_route(
+			self::NAMESPACE,
 			'/snippets/(?P<id>\d+)/files',
 			[
 				[
@@ -339,11 +363,25 @@ class Rest_Api_Controller {
 			);
 		}
 
-		$file_list = Snippet_Repository::get_snippet_file_list( $post->ID );
+		$include_content = filter_var( $request->get_param( 'include_content' ), FILTER_VALIDATE_BOOLEAN );
+
+		if ( $include_content ) {
+			$files_with_content = Snippet_Repository::get_snippet_files_by_post( $post );
+			$file_list = array_map( function ( $file ) {
+				return [
+					'name'    => $file['name'],
+					'content' => $file['content'],
+					'size'    => strlen( $file['content'] ),
+				];
+			}, $files_with_content );
+		} else {
+			$file_list = Snippet_Repository::get_snippet_file_list( $post->ID );
+		}
 
 		return rest_ensure_response( [
-			'files' => $file_list,
-			'total' => count( $file_list ),
+			'files'                  => $file_list,
+			'total'                  => count( $file_list ),
+			'isOwnedByCurrentUser'   => (int) $post->post_author === get_current_user_id(),
 		] );
 	}
 
@@ -438,6 +476,58 @@ class Rest_Api_Controller {
 		}
 
 		return $this->perform_publish( $post );
+	}
+
+	public function link_artifact_to_snippet( $request ) {
+		$post = $this->resolve_snippet_post( $request );
+
+		if ( ! $post ) {
+			return new \WP_Error(
+				'snippet_not_found',
+				esc_html__( 'Snippet not found.', 'angie' ),
+				[ 'status' => 404 ]
+			);
+		}
+
+		if ( (int) $post->post_author !== get_current_user_id() ) {
+			return new \WP_Error(
+				'snippet_not_owned',
+				esc_html__( 'This snippet was created by another user. You can only manage snippets you created. Shared snippet editing will be supported in the future.', 'angie' ),
+				[ 'status' => 403 ]
+			);
+		}
+
+		$artifact_id = $request->get_param( 'artifact_id' );
+
+		$current_artifact_id = get_post_meta( $post->ID, '_angie_snippet_artifact_id', true );
+		if ( ! empty( $current_artifact_id ) && $current_artifact_id !== $artifact_id ) {
+			return new \WP_Error(
+				'snippet_already_linked',
+				esc_html__( 'This snippet is already linked to a cloud artifact. It cannot be re-linked.', 'angie' ),
+				[ 'status' => 409 ]
+			);
+		}
+
+		$existing = Snippet_Repository::find_snippet_post_by_artifact_id( $artifact_id );
+		if ( $existing && $existing->ID !== $post->ID ) {
+			return new \WP_Error(
+				self::ERROR_ARTIFACT_SNIPPET_EXISTS,
+				sprintf(
+					/* translators: %s: artifact ID */
+					esc_html__( 'A different snippet already uses artifact ID %s.', 'angie' ),
+					$artifact_id
+				),
+				[ 'status' => 409 ]
+			);
+		}
+
+		update_post_meta( $post->ID, '_angie_snippet_artifact_id', $artifact_id );
+
+		return rest_ensure_response( [
+			'success'     => true,
+			'post_id'     => $post->ID,
+			'artifact_id' => $artifact_id,
+		] );
 	}
 
 	public function create_snippet_post( $request ) {

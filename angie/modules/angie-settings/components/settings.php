@@ -189,7 +189,7 @@ class Settings {
 
 		$updated = \update_option( $option_name, $json_value );
 
-		if ( ! $updated ) {
+		if ( ! $updated && \get_option( $option_name ) !== $json_value ) {
 			return new \WP_Error(
 				'update_failed',
 				esc_html__( 'Failed to update setting.', 'angie' ),

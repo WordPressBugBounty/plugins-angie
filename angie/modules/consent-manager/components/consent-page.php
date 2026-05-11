@@ -202,7 +202,7 @@ class Consent_Page {
 					</div>
 					<div class="angie-welcome-right" data-testid="angie-welcome-right">
 					
-							<img src="<?php echo esc_url( Utils::get_asset_url( 'angieHero.png', $this->consent_manager_module_file ) ); ?>"
+							<img src="<?php echo esc_url( Utils::get_asset_url( 'angieHeroImage.png', $this->consent_manager_module_file ) ); ?>"
 								alt="<?php esc_attr_e( 'Ask Angie AI Assistant', 'angie' ); ?>"
 								class="angie-ask-image" data-testid="angie-ask-image" />
 					
