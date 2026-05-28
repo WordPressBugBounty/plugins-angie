@@ -31,6 +31,7 @@ final class Manager {
 			'Sidebar',
 			'AngieStyles',
 			'PageTemplates',
+			'SuperAdmin',
 		];
 	}
 

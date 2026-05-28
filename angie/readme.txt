@@ -4,27 +4,29 @@ Tags: ai, agent, elementor, assistant, mcp
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.1.7
+Stable tag: 1.1.8
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 == Description ==
 
-**Angie Code:** Your expert WordPress developer, powered by AI. Build anything you can imagine without writing a single line of code.
+== Angie: Agentic AI ==
+Build Elementor widgets and code snippets for WordPress, save your work to the cloud, and run your full WordPress stack through conversation. No code or setup required.
 
-**Disclaimer:** Angie is currently in Beta. While core functionality within WordPress and the Elementor Editor is stable and ready to explore, some actions and integrations with third-party tools are still evolving. We are continuously refining Angie's capabilities and expanding its capabilities. Please ensure you back up your site before use. During this Beta phase, enjoy free daily credits and help us shape the future of AI-driven web creation with your feedback.
+**Disclaimer:** Angie is currently in Beta. While core functionality within WordPress and the Elementor Editor is stable and ready to explore, some actions and integrations with third-party tools are still evolving. We are continuously refining Angie’s capabilities and expanding its capabilities. Please ensure you back up your site before use. During this Beta phase, enjoy free daily credits and help us shape the future of AI-driven web creation with your feedback.
 
-Angie Code lets professional web creators and agencies create custom Elementor widgets, snippets for WordPress, and functionality instantly. Simply describe what you need, and watch Angie build production-ready code in seconds, zero coding knowledge required.
-
-While standard solutions provide a vital foundation for most project requirements, Angie Code eliminates the compromise of "close enough", empowering you to build the bespoke functionalities that define the final, most impactful details of your site ensuring every element meets your exact specifications with technical precision.
+Angie is an AI agent built natively into WordPress. It understands your site's architecture, installed plugins, Elementor setup, and data, and takes real action on your behalf. From writing production-ready code to managing content and executing site-wide workflows, Angie works inside the environment you already use.
+No new platform to learn. No migration required. Your existing theme, plugins, Elementor setup, and Gutenberg editor stay exactly as they are.
 
 Explore the [prompt library](https://prompts.elementor.com/?utm_source=wp-repo) for more examples.
 
-== Fully configurable inside WordPress & Elementor ==
+== Angie Code ==
 
-Angie produces PHP, CSS, and JavaScript, whose output is editable through conversation with Angie ("make the font bigger," "add a hover animation"), or switch to the Elementor Editor's visual controls for pixel-perfect adjustments. You're never locked in - every widget is yours to own, edit, and evolve.
+Angie Code lets professional web creators and agencies create custom Elementor widgets, snippets for WordPress, and functionality instantly. Describe what you need, and watch Angie build production-ready code in seconds. Zero coding required.
+Standard solutions provide a vital foundation for most projects, but Angie Code removes the compromise of "close enough," giving you bespoke functionality that meets your exact specifications with technical precision.
 
-Your existing theme, plugins, Elementor setup, and Gutenberg editor all stay exactly as they are. Angie adds AI-powered creation capabilities on top of your current environment. There is no new platform to learn, no migration required, and no disruption to your workflow.
+== Fully configurable inside WordPress and Elementor ==
+Angie produces PHP, CSS, and JavaScript, editable through conversation with Angie ("make the font bigger," "add a hover animation") or through Elementor's visual controls for pixel-perfect adjustments. You're never locked in — every widget is yours to own, edit, and evolve.
 
 == What Angie can do ==
 
@@ -34,7 +36,7 @@ Angie's expertise delivers specialized categories of production-ready components
 - **Extend Elementor widgets** - Inject custom controls and advanced capabilities into existing widgets to expand their functional range.
 - **Customize WordPress admin & backend** - Tailor your dashboard, add custom post types, extend WooCommerce, and implement custom hooks and filters.
 - **Architect front-end enhancements** - Integrate CSS and JavaScript for sophisticated animations, cursor effects, and immersive interactive behaviors.
-- **Construct visual apps** - Build fully functional front-end applications like custom calculators, and quizzes.
+- **Construct visual apps** - Build fully functional front-end applications like custom calculators and quizzes.
 - **Generate complete landing pages** - Produce entire pages with layout, content, and styling for Elementor and Gutenberg.
 
 == Multi-modal input and collaborative building ==
@@ -45,13 +47,30 @@ Angie's expertise delivers specialized categories of production-ready components
 
 == Safe by design - experiment freely, deploy confidently ==
 
-Everything Angie Code creates is built and tested in a dedicated preview environment. See it on your page, tweak it, and iterate as many times as you want - nothing is added to your live site until you personally approve it. This is your safety net: the freedom to try anything without the risk of breaking anything.
+Everything Angie Code creates is built and tested in a dedicated preview environment. See it on your page, tweak it, and iterate as many times as you want – nothing is added to your live site until you personally approve it. This is your safety net: the freedom to try anything without the risk of breaking anything.
+Restore previous versions of snippets created precisely with Revisions.
 
-== Streamline site management ==
+== Cloud Library ==
 
-Beyond building, Angie acts as an agentic assistant to help you perform site-wide workflows, handle bulk actions, and manage content through simple conversation.
+Snippets and widgets you create with Angie can be saved to your personal Cloud Library and pulled into any connected site in a few clicks, arriving as a fully editable asset.
 
-Stop compromising your vision. Start building with Angie.
+For agencies managing multiple sites, this compounds fast. A library of battle-tested snippets becomes a set of ready starting points for every new project.
+
+**No rebuilding from scratch. No credits consumed on import.**
+
+== Plan mode ==
+
+Get a better first outcome by planning with Angie before creating a widget or snippet. Angie will ask questions regarding intent, scope, and requirements, clarifying the brief before any action is taken. Nothing runs until you confirm.
+
+== Super Admin Mode ==
+
+Super Admin Mode is an opt-in capability that gives Angie read-write access to your file system, database, and PHP layer. Below are a few actions you can offload to Angie:
+
+- **Run bulk operations at scale** - Update product prices, user roles, and custom metadata across hundreds of records from a single prompt. Angie reads your actual data model first, so operations work against your real post types, registered fields, and active plugins.
+- **Debug site errors** - Trace SMTP failures, PHP conflicts, and API connectivity issues directly in the Angie chat. Angie reads your debug log, identifies recurring patterns, and can deactivate conflicting plugins or modify the relevant hook to resolve the issue.
+- **Fix SEO gaps site-wide** - Populate missing meta descriptions, create redirect rules after category restructures, and standardize URL slugs across your full site in a single session.
+
+Run the full WordPress stack through the same Angie chat.
 
 == Contributors & Developers ==
 
@@ -63,7 +82,7 @@ Contributors: Elementor
 
 = 1. What is Angie? =
 
-Angie is an AI layer for WordPress. Unlike standalone AI tools, Angie is purpose-built for the WordPress ecosystem with deep contextual understanding of your specific website, its architecture, installed plugins, and data. Angie acts as an AI-powered expert WordPress developer and agentic assistant designed to help you build and manage websites without writing any code. It functions like a senior engineer that turns plain-language descriptions into production-ready code instantly.
+Angie is an AI layer for WordPress. Unlike standalone AI tools, Angie is purpose-built for the WordPress ecosystem with deep contextual understanding of your specific website, its architecture, installed plugins, and data. Angie acts as an AI-powered expert WordPress developer and agent designed to help you build and manage websites without writing any code. It functions like a senior engineer that turns plain-language descriptions into production-ready code instantly.
 
 = 2. What is Angie Code? =
 
@@ -78,15 +97,27 @@ Here's what you can create:
 - **Construct visual apps** - Build fully functional front-end applications like custom calculators, and quizzes.
 - **Generate complete landing pages** - Produce entire pages with layout, content, and styling for Elementor and Gutenberg.
 
-= 3. Is Angie Code compatible with Elementor? =
+= 3. What is Super Admin Mode? =
+
+Super Admin Mode is an opt-in feature that gives Angie read-write access to your file system, database, and PHP layer. It's designed for advanced operations: bulk data updates, site-wide SEO fixes, and error debugging. You opt in explicitly, and Angie presents a plan before acting.
+
+= 4. What is Plan mode? =
+
+Get a better first outcome by starting a significant task with Angie plan mode. Angie will ask clarifying questions to create a robust brief that gets you closer to your intended result.  
+
+= 5. Is Angie Code compatible with Elementor? =
 
 Yes! Angie is deeply integrated with the Elementor Editor. You can generate custom widgets specifically for Elementor, allowing you to create unique layouts and functionalities that aren't available in standard widget packs. The widgets Angie creates work seamlessly with Elementor's visual controls, giving you the best of both worlds: AI-powered creation and manual refinement.
 
-= 4. Is it free to use? =
+= 6. Is it free to use? =
 
 Yes. Angie has a free tier with daily renewing credits, allowing you to explore its creation capabilities every day at no cost. This lets you experiment, learn, and build real projects without any financial commitment.
 
-= 5. How does "Test Mode" protect my site? =
+= 7. What is the Cloud Library? =
+
+The Cloud Library is your personal library for Angie creations. Snippets and widgets you build with Angie can be saved to the cloud and imported into any connected site in a few clicks as fully editable assets. No credits are consumed on import.
+
+= 8. How does "Test Mode" protect my site? =
 
 Test Mode is a secure staging environment where AI-generated code runs in isolation. You can preview, test, and interact with your creation without affecting your live site. Only when you're completely satisfied do you manually publish it to production.
 
@@ -100,7 +131,7 @@ This ensures safety and control over every AI-generated element. You can:
 
 No artifacts are published or affect your website until you've explicitly approved it.
 
-= 6. Can I use screenshots or URLs to build widgets? =
+= 9. Can I use screenshots or URLs to build widgets? =
 
 Absolutely. Angie Code supports multiple input types:
 
@@ -110,7 +141,7 @@ Absolutely. Angie Code supports multiple input types:
 
 Angie analyzes the layout, functionality, and design patterns to create a similar, fully editable artifacts for your site. This makes reverse-engineering inspiring designs incredibly fast.
 
-= 7. Do I need to be a developer to use Angie Code? =
+= 10. Do I need to be a developer to use Angie Code? =
 
 Not at all. Angie is designed to break the technical ceiling through conversation. Describe what you want, then refine it through follow-up prompts, just like working with a developer.
 
@@ -118,7 +149,7 @@ Not at all. Angie is designed to break the technical ceiling through conversatio
 
 The code remains open and fully editable for those who want to customize it manually. You're never locked in.
 
-= 8. Can I edit what Angie generates? =
+= 11. Can I edit what Angie generates? =
 
 Yes. This is core to the Angie philosophy. Every widget and snippet Angie creates is fully editable, both through continued conversation with Angie and through manual code editing.
 
@@ -131,11 +162,11 @@ You can:
 
 Your creations are never locked or proprietary. They're code that works with your entire ecosystem.
 
-= 9. Is it compatible with my theme and plugins? =
+= 12. Is it compatible with my theme and plugins? =
 
 Yes. Angie works across your entire WordPress environment. While it has deep integration with Elementor, Angie Code generates PHP, CSS, and JavaScript. Angie also understands your site's existing architecture and adapts automatically. Instead of replacing your tools, Angie is also an MCP that connects your ecosystem to help you get more from it.
 
-= 10. How does Angie handle site security? =
+= 13. How does Angie handle site security? =
 
 Angie follows WordPress security best practices. It does not perform destructive actions (like deleting content or overriding core settings) without your explicit confirmation. Because Angie is context-aware, it understands your site's boundaries and works within WordPress's security model.
 
@@ -145,7 +176,7 @@ Additionally:
 - You manually approve every change to production
 - Code is generated using WordPress coding standards
 
-= 11. Can I connect my own MCP server? =
+= 14. Can I connect my own MCP server? =
 
 Yes. Angie is fully extensible. Developers can use Angie's official SDK on GitHub to integrate custom capabilities through the Model Context Protocol (MCP), allowing Angie to interact with your specific tools and workflows in real-time.
 
@@ -155,13 +186,18 @@ Resources:
 - [NPM package](https://www.npmjs.com/package/@elementor/angie-sdk)
 - [Demo plugin](https://github.com/elementor/angie-sdk/tree/master/example/angie-demo-plugin)
 
-= 12. Do I need to speak English to use Angie? =
+= 15. Do I need to speak English to use Angie? =
 
 Not at all. Angie is built for creators worldwide. You can prompt Angie in your native language whether you speak Spanish, French, Japanese, or any other major language. Angie understands your intent and generates the correct content accordingly.
 
 Language should never be a barrier to bringing your WordPress ideas to life.
 
+
 == Changelog ==
+
+= 1.1.8 - 2026-05-28 =
+* New: Introducing Super admin mode - run powerful one time actions via PHP execution
+* Fix: User was not properly redirected to the Elementor Editor after installing Angie from the editor
 
 = 1.1.7 - 2026-05-11 =
 * Tweak: Updated Save to Cloud Library and Update Cloud Library labels based on cloud status

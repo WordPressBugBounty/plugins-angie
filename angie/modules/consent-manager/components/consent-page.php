@@ -3,6 +3,7 @@
 namespace Angie\Modules\ConsentManager\Components;
 
 use Angie\Modules\ConsentManager\Module as ConsentManager;
+use Angie\Modules\SuperAdmin\Module as SuperAdmin;
 use Angie\Includes\Utils;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -24,6 +25,7 @@ class Consent_Page {
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 		add_action( 'rest_api_init', [ $this, 'register_rest_routes' ] );
 		add_action( 'admin_init', [ $this, 'handle_reset_action' ] );
+		add_action( 'admin_post_angie_update_super_admin', [ $this, 'handle_super_admin_toggle' ] );
 	}
 
 	public function register_admin_menu() {
@@ -87,6 +89,19 @@ class Consent_Page {
 			'methods' => 'POST',
 			'callback' => [ $this, 'handle_consent_grant_rest' ],
 			'permission_callback' => [ $this, 'check_consent_permissions' ],
+			'args' => [
+				'return_to' => [
+					'type' => 'string',
+					'required' => false,
+					'sanitize_callback' => 'esc_url_raw',
+				],
+			],
+		] );
+
+		register_rest_route( 'angie/v1', '/super-admin/opt-in', [
+			'methods' => 'POST',
+			'callback' => [ $this, 'handle_super_admin_opt_in' ],
+			'permission_callback' => [ SuperAdmin::class, 'current_user_can_use' ],
 		] );
 	}
 
@@ -115,18 +130,44 @@ class Consent_Page {
 	public function handle_consent_grant_rest( $request ) {
 		// Grant consent
 		update_option( ConsentManager::CONSENT_OPTION_NAME, 'yes' );
-		
-		// Validate OAuth parameter before including in redirect
-		$oauth_param = filter_input( INPUT_GET, 'start-oauth', FILTER_VALIDATE_INT );
-		$redirect_url = admin_url( 'admin.php?page=angie-app' );
-		if ( $oauth_param === 1 ) {
-			$redirect_url .= '&start-oauth=1';
-		}
-		
+
+		// Prefer bouncing back to the wp-admin page the user came from before
+		// landing on the consent page (e.g. the Elementor editor or any 3rd-party
+		// plugin screen). The client passes that URL as `return_to` because
+		// `wp_get_referer()` here resolves to the consent page itself (the apiFetch
+		// origin), not the original referrer.
+		$return_to = $request->get_param( 'return_to' );
+		$return_to = is_string( $return_to ) ? esc_url_raw( $return_to ) : '';
+
+		$redirect_url = \Angie::resolve_post_install_target( $return_to, [ 'start-oauth' => '1' ] );
+
 		return new \WP_REST_Response( [
 			'message' => 'Consent granted successfully',
-			'redirect' => admin_url( 'admin.php?page=angie-app&start-oauth=1' ),
-		], 200 );
+			'redirect' => $redirect_url,
+		], \WP_Http::OK );
+	}
+
+	/**
+	 * Handle REST API request to opt-in to Super Admin mode.
+	 * Sets the `angie_super_admin_enabled` WP option so super-admin REST
+	 * endpoints are unlocked. Called from the iframe confirmation banner
+	 * via postMessage -> parent -> REST.
+	 */
+	public function handle_super_admin_opt_in() {
+		if ( SuperAdmin::has_explicit_setting() && ! SuperAdmin::is_enabled() ) {
+			return new \WP_Error(
+				'super_admin_explicitly_disabled',
+				esc_html__( 'Super Admin mode was explicitly disabled by an administrator.', 'angie' ),
+				[ 'status' => \WP_Http::FORBIDDEN ]
+			);
+		}
+
+		update_option( SuperAdmin::FEATURE_FLAG_OPTION, true );
+
+		return new \WP_REST_Response( [
+			'success' => true,
+			'message' => 'Super Admin mode enabled',
+		], \WP_Http::OK );
 	}
 
 	public function handle_reset_action() {
@@ -149,8 +190,39 @@ class Consent_Page {
 		// Reset the consent setting.
 		delete_option( ConsentManager::CONSENT_OPTION_NAME );
 
-		// Redirect to main Angie app (which will show welcome page since consent is now reset)
-		wp_safe_redirect( admin_url( 'admin.php?page=angie-app' ) );
+		// Bounce back to the originating wp-admin page (with `open-angie=1`) when
+		// possible; otherwise fall back to the Angie welcome page.
+		wp_safe_redirect( \Angie::resolve_post_install_target( wp_get_referer() ) );
+		exit;
+	}
+
+	/**
+	 * Handles the Super Admin toggle form submission from the Angie
+	 * Settings page. Writes the `angie_super_admin_enabled` WP option
+	 * after verifying nonce + admin capability.
+	 */
+	public function handle_super_admin_toggle() {
+		if ( ! SuperAdmin::current_user_can_use() ) {
+			wp_die( esc_html__( 'You do not have permission to change this setting.', 'angie' ) );
+		}
+
+		check_admin_referer( 'angie_update_super_admin' );
+
+		$raw_state = isset( $_POST['angie_super_admin_state'] ) ? sanitize_key( wp_unslash( $_POST['angie_super_admin_state'] ) ) : 'default';
+
+		if ( 'default' === $raw_state ) {
+			delete_option( SuperAdmin::FEATURE_FLAG_OPTION );
+		} else {
+			update_option( SuperAdmin::FEATURE_FLAG_OPTION, 'active' === $raw_state );
+		}
+
+		$redirect = add_query_arg(
+			[
+				'page' => 'angie-consent',
+			],
+			admin_url( 'admin.php' )
+		);
+		wp_safe_redirect( $redirect );
 		exit;
 	}
 
@@ -279,6 +351,71 @@ class Consent_Page {
 					</tr>
 				</table>
 			</div>
+
+			<?php $this->render_additional_settings_card(); ?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Renders the "Additional Settings" card, currently hosting the Super
+	 * Admin toggle. The dropdown is the source of truth for the
+	 * `angie_super_admin_enabled` WP option that super-admin REST endpoints
+	 * consult. Default is Disabled; the Angie consent flow also flips this
+	 * option via REST in a follow-up.
+	 */
+	private function render_additional_settings_card() {
+		if ( ! SuperAdmin::current_user_can_use() ) {
+			return;
+		}
+
+		$super_admin_enabled = SuperAdmin::is_enabled();
+		$has_explicit        = SuperAdmin::has_explicit_setting();
+
+		if ( ! $has_explicit ) {
+			$current_state = 'default';
+		} elseif ( $super_admin_enabled ) {
+			$current_state = 'active';
+		} else {
+			$current_state = 'disabled';
+		}
+		?>
+		<div class="card" style="max-width: 800px; margin-top: 20px;">
+			<h2><?php esc_html_e( 'Additional Settings', 'angie' ); ?></h2>
+
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+				<input type="hidden" name="action" value="angie_update_super_admin" />
+				<?php wp_nonce_field( 'angie_update_super_admin' ); ?>
+
+				<p><strong><?php esc_html_e( 'Super Admin mode', 'angie' ); ?></strong></p>
+				<p>
+					<?php esc_html_e( 'Enable this to allow Angie to execute server-side PHP. This grants the power to perform one-time operations like bulk page creation and direct root-level edits. Handle with care.', 'angie' ); ?>
+				</p>
+
+				<p>
+					<label for="angie_super_admin_state" class="screen-reader-text">
+						<?php esc_html_e( 'Super Admin mode state', 'angie' ); ?>
+					</label>
+					<select id="angie_super_admin_state" name="angie_super_admin_state" style="min-width: 200px;">
+						<option value="default" <?php selected( 'default', $current_state ); ?>>
+							<?php esc_html_e( 'Default (Disabled)', 'angie' ); ?>
+						</option>
+						<option value="disabled" <?php selected( 'disabled', $current_state ); ?>>
+							<?php esc_html_e( 'Disabled', 'angie' ); ?>
+						</option>
+						<option value="active" <?php selected( 'active', $current_state ); ?>>
+							<?php esc_html_e( 'Active', 'angie' ); ?>
+						</option>
+					</select>
+					<button type="submit" class="button button-primary" style="margin-left: 10px;">
+						<?php esc_html_e( 'Save', 'angie' ); ?>
+					</button>
+				</p>
+
+				<p style="color: #b26500; margin-top: 10px;">
+					<?php esc_html_e( 'Warning: Executing PHP directly from the root can bypass safety filters. Ensure your backups are current.', 'angie' ); ?>
+				</p>
+			</form>
 		</div>
 		<?php
 	}
@@ -315,7 +452,8 @@ class Consent_Page {
 					
 					wp.apiFetch({
 						path: '/angie/v1/consent',
-						method: 'POST'
+						method: 'POST',
+						data: { return_to: document.referrer || '' },
 					})
 					.then(function(response) {
 						console.log('Consent granted successfully');

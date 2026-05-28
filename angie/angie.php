@@ -3,7 +3,7 @@
  * Plugin Name: Angie
  * Description: Agentic AI for WordPress
  * Plugin URI: https://elementor.com/pages/angie-early-access
- * Version: 1.1.7
+ * Version: 1.1.8
  * Author: Elementor.com
  * Author URI: https://elementor.com/?utm_source=wp-plugins-angie&utm_campaign=author-uri&utm_medium=wp-dash
  * Text Domain: angie
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'ANGIE_VERSION', '1.1.7' );
+define( 'ANGIE_VERSION', '1.1.8' );
 define( 'ANGIE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ANGIE_URL', plugins_url( '/', __FILE__ ) );
 define( 'ANGIE_ASSETS_PATH', ANGIE_PATH . 'assets/' );
@@ -154,9 +154,59 @@ final class Angie {
 			return;
 		}
 
-		// Perform the redirect
-		wp_safe_redirect( admin_url( 'admin.php?page=angie-app' ) );
+		// If activation was triggered from any same-origin wp-admin page (e.g.
+		// installed via Elementor editor or any 3rd-party plugin screen), bounce
+		// straight back to it with `open-angie=1` so the sidebar auto-opens —
+		// avoids the visible flash of the angie-app page that the JS fallback
+		// redirect cannot prevent (the 302 to angie-app happens before any JS
+		// runs).
+		$target = self::resolve_post_install_target( wp_get_referer() );
+		wp_safe_redirect( $target );
 		exit;
+	}
+
+	/**
+	 * Resolve the post-install / consent-flow target URL.
+	 *
+	 * Prefers the same-origin wp-admin referrer (with `open-angie=1` appended) so
+	 * the user is sent back to where they triggered the install/consent action.
+	 * Falls back to the Angie app page when no usable referrer is available.
+	 *
+	 * @param string|false $referer A referer URL or false.
+	 * @param array        $extra_args Extra query args to merge into the bounce URL.
+	 * @return string Absolute URL suitable for redirect.
+	 */
+	public static function resolve_post_install_target( $referer, array $extra_args = [] ) {
+		$fallback_base = admin_url( 'admin.php?page=angie-app' );
+		$fallback = empty( $extra_args ) ? $fallback_base : add_query_arg( $extra_args, $fallback_base );
+
+		if ( ! $referer || 0 !== strpos( $referer, admin_url() ) ) {
+			return $fallback;
+		}
+
+		$parts = wp_parse_url( $referer );
+		$path = isset( $parts['path'] ) ? basename( $parts['path'] ) : '';
+		$query = [];
+		if ( ! empty( $parts['query'] ) ) {
+			wp_parse_str( $parts['query'], $query );
+		}
+
+		// Never bounce back to nonce-protected action pages (e.g. update.php
+		// used by zip upload) — the nonce will have expired by the time the
+		// redirect fires, producing "The link you followed has expired."
+		$nonce_pages = [ 'update.php', 'update-core.php' ];
+		if ( in_array( $path, $nonce_pages, true ) ) {
+			return $fallback;
+		}
+
+		// Never bounce back to angie-app / angie-consent — they're the source of the flash.
+		$source_page = isset( $query['page'] ) ? $query['page'] : '';
+		if ( in_array( $source_page, [ 'angie-app', 'angie-consent' ], true ) ) {
+			return $fallback;
+		}
+
+		$args = array_merge( [ 'open-angie' => '1' ], $extra_args );
+		return add_query_arg( $args, $referer );
 	}
 
 	public static function activate_plugin() {
