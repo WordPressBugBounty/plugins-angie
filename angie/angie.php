@@ -3,7 +3,7 @@
  * Plugin Name: Angie
  * Description: Agentic AI for WordPress
  * Plugin URI: https://elementor.com/pages/angie-early-access
- * Version: 1.1.9
+ * Version: 1.1.10
  * Author: Elementor.com
  * Author URI: https://elementor.com/?utm_source=wp-plugins-angie&utm_campaign=author-uri&utm_medium=wp-dash
  * Text Domain: angie
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'ANGIE_VERSION', '1.1.9' );
+define( 'ANGIE_VERSION', '1.1.10' );
 define( 'ANGIE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ANGIE_URL', plugins_url( '/', __FILE__ ) );
 define( 'ANGIE_ASSETS_PATH', ANGIE_PATH . 'assets/' );
@@ -196,6 +196,13 @@ final class Angie {
 		// redirect fires, producing "The link you followed has expired."
 		$nonce_pages = [ 'update.php', 'update-core.php' ];
 		if ( in_array( $path, $nonce_pages, true ) ) {
+			return $fallback;
+		}
+
+		// Never bounce back to plugin management pages — the Angie sidebar does
+		// not render there, so open-angie=1 has no effect and the user sees no change.
+		$plugin_pages = [ 'plugins.php', 'plugin-install.php' ];
+		if ( in_array( $path, $plugin_pages, true ) ) {
 			return $fallback;
 		}
 

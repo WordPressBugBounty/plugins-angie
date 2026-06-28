@@ -4,13 +4,15 @@ Tags: ai, agent, elementor, assistant, mcp
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.1.9
+Stable tag: 1.1.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
+Build anything your site needs. Manage it through an agentic AI conversation inside WordPress. No setup, configuration, or code required.
+
 == Description ==
 
-== Angie: Agentic AI ==
+**Angie: Agentic AI**
 Build Elementor widgets and code snippets for WordPress, save your work to the cloud, and run your full WordPress stack through conversation. No code or setup required.
 
 **Disclaimer:** Angie is currently in Beta. While core functionality within WordPress and the Elementor Editor is stable and ready to explore, some actions and integrations with third-party tools are still evolving. We are continuously refining Angie’s capabilities and expanding its capabilities. Please ensure you back up your site before use. During this Beta phase, enjoy free daily credits and help us shape the future of AI-driven web creation with your feedback.
@@ -194,6 +196,9 @@ Language should never be a barrier to bringing your WordPress ideas to life.
 
 
 == Changelog ==
+
+= 1.1.10 - 2026-06-28 =
+Fix: Angie is not redirecting the user to Angie Home admin page after plugin activation
 
 = 1.1.9 - 2026-06-10 =
 * Tweak: Removed test mode admin notice on Angie snippet pages
