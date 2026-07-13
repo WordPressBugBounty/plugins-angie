@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Admin "Agents" coming-soon screen.
+ * Admin "Agents" screen — coming-soon by default; platform iframe when `angie_agents_platform` gate is open.
  */
 class Agents_Page {
 
@@ -73,13 +73,26 @@ class Agents_Page {
 			ANGIE_VERSION,
 			true
 		);
+
+		wp_localize_script(
+			'angie-agents-page',
+			'angieAgentsPageConfig',
+			[
+				'wpUsername' => wp_get_current_user()->user_login,
+			]
+		);
 	}
 
 	public function render_agents_page(): void {
 		$icon_url = plugins_url( 'modules/consent-manager/assets/angieIcon.svg', ANGIE_PATH . 'angie.php' );
 		?>
-		<div class="angie-welcome-page angie-agents-page">
-			<div class="angie-agents-content">
+		<div class="angie-agents-page" id="angie-agents-page">
+			<div class="angie-agents-platform-loading" id="angie-agents-platform-loading" aria-live="polite" aria-busy="true" hidden>
+				<span class="angie-agents-platform-loading-spinner" aria-hidden="true"></span>
+				<p class="angie-agents-platform-loading-text"><?php esc_html_e( 'Loading agents…', 'angie' ); ?></p>
+			</div>
+			<div class="angie-agents-platform-host" id="angie-agents-platform-host" hidden></div>
+			<div class="angie-agents-content" id="angie-agents-coming-soon">
 				<div class="angie-agents-logo">
 					<img src="<?php echo esc_url( $icon_url ); ?>"
 						alt="" class="angie-agents-logo-icon" />

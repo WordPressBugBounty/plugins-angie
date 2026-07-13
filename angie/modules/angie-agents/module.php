@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Angie Agents admin module (coming-soon Agents screen).
+ * Angie Agents admin module (coming-soon Agents screen; platform iframe via `angie_agents_platform` gate).
  */
 class Module extends Module_Base {
 

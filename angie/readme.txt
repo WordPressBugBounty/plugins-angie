@@ -1,10 +1,10 @@
-=== Angie - Agentic AI (Beta) ===
+=== Angie - Agentic AI ===
 Contributors: elemntor
 Tags: ai, agent, elementor, assistant, mcp
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.1.10
+Stable tag: 1.1.11
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -15,7 +15,8 @@ Build anything your site needs. Manage it through an agentic AI conversation ins
 **Angie: Agentic AI**
 Build Elementor widgets and code snippets for WordPress, save your work to the cloud, and run your full WordPress stack through conversation. No code or setup required.
 
-**Disclaimer:** Angie is currently in Beta. While core functionality within WordPress and the Elementor Editor is stable and ready to explore, some actions and integrations with third-party tools are still evolving. We are continuously refining Angie’s capabilities and expanding its capabilities. Please ensure you back up your site before use. During this Beta phase, enjoy free daily credits and help us shape the future of AI-driven web creation with your feedback.
+**Disclaimer:** While functionality within WordPress Core and the Elementor Editor is stable, some integrations with third-party tools are still evolving. We're continuously refining and expanding Angie's capabilities.
+Please ensure to back up your site before use.
 
 Angie is an AI agent built natively into WordPress. It understands your site's architecture, installed plugins, Elementor setup, and data, and takes real action on your behalf. From writing production-ready code to managing content and executing site-wide workflows, Angie works inside the environment you already use.
 No new platform to learn. No migration required. Your existing theme, plugins, Elementor setup, and Gutenberg editor stay exactly as they are.
@@ -196,6 +197,9 @@ Language should never be a barrier to bringing your WordPress ideas to life.
 
 
 == Changelog ==
+
+= 1.1.11 - 2026-07-13 =
+* Fix: PHP warning in error logs when validating code snippets ([Topic](https://wordpress.org/support/topic/failed-to-set-memory-limit/))
 
 = 1.1.10 - 2026-06-28 =
 Fix: Angie is not redirecting the user to Angie Home admin page after plugin activation

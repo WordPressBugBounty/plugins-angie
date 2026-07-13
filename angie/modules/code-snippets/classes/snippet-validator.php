@@ -159,7 +159,17 @@ class Snippet_Validator {
 		$original_memory_limit = ini_get( 'memory_limit' );
 
 		set_time_limit( 5 );
-		ini_set( 'memory_limit', '64M' );
+
+		$sandbox_memory_limit = '64M';
+		$sandbox_memory_bytes = wp_convert_hr_to_bytes( $sandbox_memory_limit );
+		$memory_limit_lowered   = false;
+		$current_limit_bytes    = wp_convert_hr_to_bytes( ini_get( 'memory_limit' ) );
+
+		if ( wp_is_ini_value_changeable( 'memory_limit' )
+			&& ( -1 === $current_limit_bytes || $current_limit_bytes > $sandbox_memory_bytes )
+		) {
+			$memory_limit_lowered = false !== ini_set( 'memory_limit', $sandbox_memory_limit );
+		}
 
 		ob_start();
 
@@ -176,7 +186,9 @@ class Snippet_Validator {
 			restore_error_handler();
 
 			set_time_limit( $original_time_limit );
-			ini_set( 'memory_limit', $original_memory_limit );
+			if ( $memory_limit_lowered ) {
+				ini_set( 'memory_limit', $original_memory_limit );
+			}
 
 			return [
 				'valid'   => true,
@@ -190,7 +202,9 @@ class Snippet_Validator {
 			restore_error_handler();
 
 			set_time_limit( $original_time_limit );
-			ini_set( 'memory_limit', $original_memory_limit );
+			if ( $memory_limit_lowered ) {
+				ini_set( 'memory_limit', $original_memory_limit );
+			}
 
 			return [
 				'valid'   => false,
