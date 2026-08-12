@@ -13,6 +13,8 @@ use Angie\Modules\ElementorCore\Components\Kit_Provider;
 use Angie\Modules\ElementorCore\Components\Component_Preview_Fix;
 use Angie\Modules\ElementorCore\Components\Elementor_Library_Type_Sync;
 use Angie\Modules\ElementorCore\Components\Elementor_Library_Template_Types;
+use Angie\Modules\ElementorCore\Components\Abilities_Registrar;
+use Angie\Modules\WpAbilities\Classes\Wp_Abilities_Support;
 use Angie\Includes\Utils;
 /**
  * Module `Elementor Editor`
@@ -43,6 +45,7 @@ class Module extends Module_Base {
 	protected function __construct() {
 		new Component_Preview_Fix();
 		$this->init_rest_controllers();
+		Wp_Abilities_Support::register_hooks( Abilities_Registrar::class );
 		add_action( 'elementor/editor/after_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 		add_action( 'elementor/elements/categories_registered', [ $this, 'register_widget_categories' ] );
 		add_action( 'elementor/editor/templates/panel/category', [ $this, 'render_angie_category_generate_button' ] );

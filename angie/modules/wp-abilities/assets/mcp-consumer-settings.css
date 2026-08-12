@@ -1,0 +1,64 @@
+.angie-mcp-config-path {
+	font-size: 11px;
+	line-height: 1.4;
+	font-family: Consolas, Monaco, monospace;
+	background: #f0f0f1;
+	padding: 1px 5px;
+	border-radius: 2px;
+	cursor: pointer;
+	color: #2271b1;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.angie-mcp-config-path:hover,
+.angie-mcp-config-path:focus {
+	color: #135e96;
+	background: #e5e5e5;
+	outline: 1px solid #2271b1;
+	outline-offset: 1px;
+}
+
+.angie-mcp-path-copy-notice,
+.angie-mcp-consumer-status-success,
+.angie-mcp-consumer-status-error {
+	margin: 8px 0 12px;
+	padding: 8px 12px;
+	color: #1d2327;
+}
+
+.angie-mcp-path-copy-notice,
+.angie-mcp-consumer-status-success {
+	background: #edfaef;
+	border-left: 4px solid #00a32a;
+}
+
+.angie-mcp-path-copy-notice.is-error,
+.angie-mcp-consumer-status-error {
+	background: #fcf0f1;
+	border-left: 4px solid #d63638;
+}
+
+.angie-mcp-generated-password-notice {
+	margin-top: 12px;
+	padding: 10px 12px;
+	background: #fcf9e8;
+	border-left: 4px solid #dba617;
+	color: #1d2327;
+}
+
+#angie-mcp-consumer-config {
+	margin-top: 12px;
+	width: 100%;
+	max-width: 100%;
+	min-height: 320px;
+	box-sizing: border-box;
+	font-family: Consolas, Monaco, monospace;
+	font-size: 12px;
+	line-height: 1.5;
+	resize: vertical;
+}
+
+.angie-mcp-config-snippet-field td {
+	padding-right: 0;
+}

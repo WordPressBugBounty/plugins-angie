@@ -12,6 +12,7 @@ class Post_Type_Manager {
 	public static function init() {
 		add_action( 'init', [ __CLASS__, 'register_post_type' ] );
 		add_action( 'admin_menu', [ __CLASS__, 'adjust_menu_position' ], 999 );
+		add_action( 'admin_bar_menu', [ __CLASS__, 'remove_new_snippet_from_admin_bar' ], 999 );
 	}
 
 	public static function register_post_type() {
@@ -41,11 +42,11 @@ class Post_Type_Manager {
 		$args = [
 			'labels' => $labels,
 			'public' => false,
-			'publicly_queryable' => false,
+			'publicly_queryable' => true,
 			'exclude_from_search' => true,
 			'show_ui' => true,
 			'show_in_menu' => 'angie-app',
-			'show_in_admin_bar' => false,
+			'show_in_admin_bar' => true,
 			'show_in_nav_menus' => false,
 			'show_in_rest' => false,
 			'has_archive' => false,
@@ -73,6 +74,14 @@ class Post_Type_Manager {
 		];
 
 		register_post_type( Module::CPT_NAME, $args );
+	}
+
+	public static function remove_new_snippet_from_admin_bar( $wp_admin_bar ): void {
+		if ( ! $wp_admin_bar instanceof \WP_Admin_Bar ) {
+			return;
+		}
+
+		$wp_admin_bar->remove_node( 'new-' . Module::CPT_NAME );
 	}
 
 	public static function adjust_menu_position() {

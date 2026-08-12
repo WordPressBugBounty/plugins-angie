@@ -2,6 +2,7 @@
 namespace Angie\Modules\CodeSnippets\Classes;
 
 use Angie\Modules\CodeSnippets\Module;
+use Angie\Modules\CodeSnippets\PreviewSettings\Elementor_Preview_Settings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -168,6 +169,10 @@ class Rest_Api_Controller {
 							'type' => 'string',
 							'sanitize_callback' => 'sanitize_text_field',
 						],
+						'elementor_preview_settings' => [
+							'required' => false,
+							'type'     => 'object',
+						],
 					],
 				],
 			]
@@ -190,6 +195,10 @@ class Rest_Api_Controller {
 						'files' => [
 							'required' => true,
 							'type' => 'array',
+						],
+						'elementor_preview_settings' => [
+							'required' => false,
+							'type'     => 'object',
 						],
 						'version' => [
 							'required' => false,
@@ -649,12 +658,21 @@ class Rest_Api_Controller {
 		File_System_Handler::write_snippet_files_to_disk( Dev_Mode_Manager::ENV_DEV, $post->ID, $sanitized_files );
 		Cache_Manager::clear_published_snippet_cache();
 
-		return rest_ensure_response( [
-			'success' => true,
-			'message' => esc_html__( 'Snippet files updated successfully.', 'angie' ),
-			'post_id' => $post->ID,
-			'files'   => count( $sanitized_files ),
-		] );
+		$settings_error = Elementor_Preview_Settings::save_from_request( $post->ID, $request );
+		if ( is_wp_error( $settings_error ) ) {
+			return $settings_error;
+		}
+
+		return rest_ensure_response(
+			Elementor_Preview_Settings::enrich_files_update_response(
+				$post,
+				[
+					'success' => true,
+					'message' => esc_html__( 'Snippet files updated successfully.', 'angie' ),
+					'files'   => count( $sanitized_files ),
+				]
+			)
+		);
 	}
 
 	public function rename_snippet_by_artifact( $request ) {
@@ -723,13 +741,22 @@ class Rest_Api_Controller {
 		File_System_Handler::write_snippet_files_to_disk( Dev_Mode_Manager::ENV_DEV, $post->ID, $sanitized_files );
 		Cache_Manager::clear_published_snippet_cache();
 
-		return rest_ensure_response( [
-			'success'     => true,
-			'message'     => esc_html__( 'Snippet files updated successfully.', 'angie' ),
-			'post_id'     => $post->ID,
-			'artifact_id' => $artifact_id,
-			'files'       => count( $sanitized_files ),
-		] );
+		$settings_error = Elementor_Preview_Settings::save_from_request( $post->ID, $request );
+		if ( is_wp_error( $settings_error ) ) {
+			return $settings_error;
+		}
+
+		return rest_ensure_response(
+			Elementor_Preview_Settings::enrich_files_update_response(
+				$post,
+				[
+					'success'     => true,
+					'message'     => esc_html__( 'Snippet files updated successfully.', 'angie' ),
+					'artifact_id' => $artifact_id,
+					'files'       => count( $sanitized_files ),
+				]
+			)
+		);
 	}
 
 	private function resolve_snippet_post( $request ) {

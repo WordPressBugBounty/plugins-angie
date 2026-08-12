@@ -14,6 +14,10 @@ use Angie\Modules\CodeSnippets\Classes\Dev_Mode_Manager;
 use Angie\Modules\CodeSnippets\Classes\Rest_Api_Controller;
 use Angie\Modules\CodeSnippets\Classes\List_Table_Manager;
 use Angie\Modules\CodeSnippets\Classes\Fatal_Error_Handler;
+use Angie\Modules\CodeSnippets\Classes\Abilities_Registrar;
+use Angie\Modules\WpAbilities\Classes\Wp_Abilities_Support;
+use Angie\Modules\CodeSnippets\Classes\Snippet_Preview_Template;
+use Angie\Modules\CodeSnippets\PreviewSettings\Elementor_Preview_Document;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -36,6 +40,8 @@ class Module extends Module_Base {
 
 		add_action( 'rest_api_init', [ $this, 'register_rest_routes' ] );
 		add_action( 'wp_logout', [ Dev_Mode_Manager::class, 'clear_dev_mode_session' ] );
+
+		Wp_Abilities_Support::register_hooks( Abilities_Registrar::class );
 
 		if ( $this->should_load_snippets() ) {
 			Dev_Mode_Manager::load_snippets();
@@ -81,6 +87,8 @@ class Module extends Module_Base {
 	private function init_components() {
 		require_once __DIR__ . '/utils.php';
 
+		Elementor_Preview_Document::register_hooks();
+
 		Post_Type_Manager::init();
 		Taxonomy_Manager::init();
 		Assets_Manager::init();
@@ -90,6 +98,7 @@ class Module extends Module_Base {
 		Cache_Manager::init();
 		File_System_Handler::init();
 		List_Table_Manager::init();
+		Snippet_Preview_Template::init();
 	}
 
 	public function register_rest_routes() {

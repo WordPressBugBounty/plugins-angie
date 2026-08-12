@@ -2,6 +2,7 @@
 namespace Angie\Modules\CodeSnippets\Classes;
 
 use Angie\Modules\CodeSnippets\Module;
+use Angie\Modules\CodeSnippets\PreviewSettings\Elementor_Preview_Document;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -16,12 +17,28 @@ class List_Table_Manager {
 		add_filter( 'angie_config', [ __CLASS__, 'add_config' ] );
 		add_action( 'wp_ajax_angie_toggle_snippet_status', [ __CLASS__, 'ajax_toggle_status' ] );
 		add_action( 'wp_ajax_angie_push_to_production', [ __CLASS__, 'ajax_push_to_production' ] );
-		add_filter( 'post_row_actions', [ __CLASS__, 'remove_quick_edit' ], 10, 2 );
+		add_filter( 'post_row_actions', [ __CLASS__, 'filter_post_row_actions' ], 10, 2 );
 	}
 
-	public static function remove_quick_edit( $actions, $post ) {
-		if ( Module::CPT_NAME === $post->post_type ) {
-			unset( $actions['inline hide-if-no-js'] );
+	/**
+	 * @param array<string, string> $actions
+	 * @param \WP_Post              $post
+	 * @return array<string, string>
+	 */
+	public static function filter_post_row_actions( $actions, $post ) {
+		if ( Module::CPT_NAME !== $post->post_type ) {
+			return $actions;
+		}
+
+		unset( $actions['inline hide-if-no-js'], $actions['view'] );
+
+		$permalink = get_permalink( $post );
+		if ( $permalink && Elementor_Preview_Document::is_elementor_widget_snippet( (int) $post->ID ) ) {
+			$actions['angie_preview'] = sprintf(
+				'<a href="%1$s">%2$s</a>',
+				esc_url( $permalink ),
+				esc_html__( 'Preview', 'angie' )
+			);
 		}
 
 		return $actions;

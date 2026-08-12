@@ -353,6 +353,8 @@ class Consent_Page {
 			</div>
 
 			<?php $this->render_additional_settings_card(); ?>
+
+			<?php do_action( 'angie_settings_page_cards' ); ?>
 		</div>
 		<?php
 	}

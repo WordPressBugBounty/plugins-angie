@@ -9,7 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Kit Provider
  *
- * Simplified version that handles only global colors, fonts and layout settings via REST API
+ * Exposes Elementor Site Settings (kit document) via REST. POST merges any kit
+ * control keys registered on the active kit tabs into saved settings.
  */
 class Kit_Provider {
 
@@ -150,7 +151,7 @@ class Kit_Provider {
 	public function update_kit_settings( $request ) {
 		$kits_manager = \Elementor\Plugin::$instance->kits_manager;
 		$active_kit   = $kits_manager->get_active_kit();
-		$params       = $request->get_json_params();
+		$params       = $request->get_params();
 
 		if ( ! $active_kit ) {
 			return new \WP_Error( 'no_active_kit', 'No active Elementor kit found', [ 'status' => 404 ] );

@@ -3,13 +3,13 @@
  * Plugin Name: Angie
  * Description: Agentic AI for WordPress
  * Plugin URI: https://elementor.com/pages/angie-early-access
- * Version: 1.1.11
+ * Version: 1.1.12
  * Author: Elementor.com
  * Author URI: https://elementor.com/?utm_source=wp-plugins-angie&utm_campaign=author-uri&utm_medium=wp-dash
  * Text Domain: angie
  * License: GPLv3
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
- * Requires at least: 6.2
+ * Requires at least: 6.9
  * Tested up to: 7.0
  * Requires PHP: 7.4
  *
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'ANGIE_VERSION', '1.1.11' );
+define( 'ANGIE_VERSION', '1.1.12' );
 define( 'ANGIE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ANGIE_URL', plugins_url( '/', __FILE__ ) );
 define( 'ANGIE_ASSETS_PATH', ANGIE_PATH . 'assets/' );
@@ -32,28 +32,12 @@ define( 'ANGIE_ASSETS_URL', ANGIE_URL . 'assets/' );
 final class Angie {
 
 	public function __construct() {
-       $this->load_composer_autoloader();
+		require_once ANGIE_PATH . 'includes/load-composer-autoload.php';
+		angie_load_composer_autoload( ANGIE_PATH );
 		add_action( 'plugins_loaded', [ $this, 'init' ] );
 		add_action( 'admin_init', [ $this, 'redirect_after_activation' ] );
 		add_action( 'init', [ $this, 'register_meta_fields' ] );
 	}
-
-    /**
-     * Load composer autoloader if available
-     */
-    private function load_composer_autoloader() {
-        $autoloader_path = ANGIE_PATH . 'vendor/autoload.php';
-        if ( file_exists( $autoloader_path ) ) {
-            try {
-                require_once $autoloader_path;
-            } catch ( \Throwable $e ) {
-                if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-                    // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Intentional debug logging when WP_DEBUG is enabled
-                    error_log( 'Angie: Failed to load composer autoloader: ' . $e->getMessage() );
-                }
-            }
-        }
-    }
 
 	public function register_meta_fields() {
 		register_post_meta(

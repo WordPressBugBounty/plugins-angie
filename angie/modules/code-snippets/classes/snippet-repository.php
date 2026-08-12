@@ -38,9 +38,9 @@ class Snippet_Repository {
 	}
 
 	public static function get_snippet_slug_from_post( $post ) {
-		$slug = sanitize_title( $post->post_title );
+		$slug = $post->post_name;
 		if ( empty( $slug ) ) {
-			$slug = $post->post_name;
+			$slug = sanitize_title( $post->post_title );
 		}
 		if ( empty( $slug ) ) {
 			$slug = 'snippet-' . $post->ID;
@@ -146,7 +146,7 @@ class Snippet_Repository {
 			$data['widgetName'] = Widget_Name_Resolver::get_widget_name_for_snippet( $post->ID );
 		}
 
-		return $data;
+		return apply_filters( 'angie_snippet_data', $data, $post );
 	}
 
 	public static function get_file_by_name( $post_id, $filename ) {

@@ -3,6 +3,8 @@ namespace Angie\Modules\SuperAdmin;
 
 use Angie\Classes\Module_Base;
 use Angie\Modules\SuperAdmin\Classes\Rest_Api_Controller;
+use Angie\Modules\SuperAdmin\Classes\Abilities_Registrar;
+use Angie\Modules\WpAbilities\Classes\Wp_Abilities_Support;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -19,6 +21,8 @@ class Module extends Module_Base {
 	public function __construct() {
 		add_action( 'rest_api_init', [ $this, 'register_rest_routes' ] );
 		add_filter( 'angie_config', [ $this, 'inject_super_admin_config' ] );
+
+		Wp_Abilities_Support::register_hooks( Abilities_Registrar::class );
 	}
 
 	public function inject_super_admin_config( array $config ): array {
