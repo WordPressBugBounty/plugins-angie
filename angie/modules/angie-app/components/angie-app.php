@@ -2,6 +2,7 @@
 
 namespace Angie\Modules\AngieApp\Components;
 
+use Angie\Modules\AngieApp\Classes\Legacy_Woocommerce_Mcp_Plugin_Support;
 use Angie\Modules\ConsentManager\Module as ConsentManager;
 use Angie\Modules\ConsentManager\Components\Consent_Page;
 use Angie\Includes\Utils;
@@ -120,6 +121,7 @@ class Angie_App {
 		// Is WooCommerce active?
 		if ( Utils::is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
 			$plugins['woocommerce'] = [];
+			$plugins['woocommerce']['isLegacyMcpEnabled'] = Legacy_Woocommerce_Mcp_Plugin_Support::should_register_legacy_woocommerce_plugin();
 
 			// Only check for single product edit page in admin area where get_current_screen() is available.
 			$is_single_product_edit_page = false;

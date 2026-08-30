@@ -8,7 +8,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Mcp_Adapter_Ability_Executors {
 
-	public static function execute_discover(): array|\WP_Error {
+	/**
+	 * @return array|\WP_Error
+	 */
+	public static function execute_discover() {
 		$abilities = [];
 
 		foreach ( wp_get_abilities() as $ability ) {
@@ -182,7 +185,11 @@ class Mcp_Adapter_Ability_Executors {
 		return $response;
 	}
 
-	private static function normalize_parameters( \WP_Ability $ability, mixed $parameters ): mixed {
+	/**
+	 * @param mixed $parameters
+	 * @return mixed
+	 */
+	private static function normalize_parameters( \WP_Ability $ability, $parameters ) {
 		if ( class_exists( '\WP\MCP\Domain\Utils\AbilityArgumentNormalizer' ) ) {
 			return \WP\MCP\Domain\Utils\AbilityArgumentNormalizer::normalize( $ability, $parameters );
 		}
@@ -190,7 +197,11 @@ class Mcp_Adapter_Ability_Executors {
 		return $parameters;
 	}
 
-	private static function validate_ability_output( mixed $result, array $schema, string $context ): bool|\WP_Error {
+	/**
+	 * @param mixed $result
+	 * @return bool|\WP_Error
+	 */
+	private static function validate_ability_output( $result, array $schema, string $context ) {
 		if ( empty( $schema ) || ! function_exists( 'rest_validate_value_from_schema' ) ) {
 			return true;
 		}

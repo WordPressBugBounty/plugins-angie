@@ -12,6 +12,7 @@ use Angie\Modules\AcfRestApi\Components\Post_Type;
 use Angie\Modules\AcfRestApi\Components\Field;
 use Angie\Modules\AcfRestApi\Components\FieldGroup;
 use Angie\Modules\AcfRestApi\Components\Taxonomy;
+use Angie\Modules\AcfRestApi\Classes\Legacy_Mcp_Plugin_Support;
 
 class Module extends Module_Base {
 
@@ -58,7 +59,10 @@ class Module extends Module_Base {
 	public function __construct() {
 		$this->init_rest_controllers();
 		add_filter( 'angie_mcp_plugins', function ( $plugins ) {
-			$plugins['acf'] = [];
+			if ( Legacy_Mcp_Plugin_Support::should_register_legacy_acf_plugin() ) {
+				$plugins['acf'] = [];
+			}
+
 			return $plugins;
 		} );
 	}

@@ -17,6 +17,7 @@ final class Manager {
 	public static function get_module_list(): array {
 		return [
 			'AngieApp', // must be first for admin menu.
+			'Mcp',
 			'PluginAvailability',
 			'ElementorCore',
 			'ConsentManager',
@@ -31,7 +32,6 @@ final class Manager {
 			'ElementorPro',
 			'Notifications',
 			'Sidebar',
-			'AngieStyles',
 			'PageTemplates',
 			'SuperAdmin',
 		];

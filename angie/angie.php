@@ -3,14 +3,14 @@
  * Plugin Name: Angie
  * Description: Agentic AI for WordPress
  * Plugin URI: https://elementor.com/pages/angie-early-access
- * Version: 1.1.12
+ * Version: 1.1.14
  * Author: Elementor.com
  * Author URI: https://elementor.com/?utm_source=wp-plugins-angie&utm_campaign=author-uri&utm_medium=wp-dash
  * Text Domain: angie
  * License: GPLv3
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  * Requires at least: 6.9
- * Tested up to: 7.0
+ * Tested up to: 7.1
  * Requires PHP: 7.4
  *
  * @package Angie
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'ANGIE_VERSION', '1.1.12' );
+define( 'ANGIE_VERSION', '1.1.14' );
 define( 'ANGIE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ANGIE_URL', plugins_url( '/', __FILE__ ) );
 define( 'ANGIE_ASSETS_PATH', ANGIE_PATH . 'assets/' );
@@ -62,18 +62,6 @@ final class Angie {
 			]
 		);
 
-		register_post_meta(
-			'',
-			'_angie_page',
-			[
-				'show_in_rest' => true,
-				'single' => true,
-				'type' => 'boolean',
-				'auth_callback' => function( $allowed, $meta_key, $post_id ) {
-					return current_user_can( 'edit_post', $post_id );
-				},
-			]
-		);
 	}
 
 	public function can_edit_ai_description_meta(

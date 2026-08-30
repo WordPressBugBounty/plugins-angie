@@ -27,7 +27,11 @@ class Mcp_Server_Registrar {
 
 	private const SERVER_VERSION = '1.0.0';
 
-	public static function register_servers( McpAdapter $adapter ): void {
+	public static function register_servers( $adapter ): void {
+		if ( ! $adapter instanceof McpAdapter ) {
+			return;
+		}
+
 		if ( ! Wp_Abilities_Support::is_mcp_adapter_supported() ) {
 			return;
 		}

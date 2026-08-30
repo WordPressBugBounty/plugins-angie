@@ -73,9 +73,8 @@ class Wp_Abilities_Support {
 		add_action( 'wp_abilities_api_init', [ Mcp_Adapter_Ability_Registration::class, 'register_abilities' ], 100 );
 		add_action( 'mcp_adapter_init', [ Mcp_Server_Registrar::class, 'register_servers' ], 99 );
 
-		// Angie bundles wordpress/mcp-adapter; bootstrap ensures /mcp/angie is registered.
+		// Bootstrap ensures the legacy /mcp/angie route is registered; the advertised endpoint
+		// is the unified /elementor/mcp server, fed Angie's abilities via modules/mcp.
 		\WP\MCP\Core\McpAdapter::instance();
-
-		new Mcp_Consumer_Settings();
 	}
 }

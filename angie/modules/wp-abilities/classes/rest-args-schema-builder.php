@@ -14,6 +14,7 @@ class Rest_Args_Schema_Builder {
 				'type'                 => 'object',
 				'properties'           => [],
 				'additionalProperties' => false,
+				'default'              => (object) [],
 			];
 		}
 

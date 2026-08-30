@@ -2,9 +2,9 @@
 Contributors: elemntor
 Tags: ai, agent, elementor, assistant, mcp
 Requires at least: 6.9
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.12
+Stable tag: 1.1.14
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -195,8 +195,15 @@ Language should never be a barrier to bringing your WordPress ideas to life.
 
 == Changelog ==
 
-= 1.1.12 - 2026-08-12 =
+= 1.1.14 - 2026-08-30 =
 * New: Introducing Angie MCP - Connect any AI client to your site with Angie
+
+= 1.1.13 - 2026-08-30 =
+* Tweak: Prevented duplicate ACF and WooCommerce tools in Angie
+* Fix: Fatal parse error causing Angie to crash on PHP 7.4
+* Fix: WordPress white-screen conflict when another MCP plugin is active
+
+= 1.1.12 - 2026-08-12 =
 * Tweak: Register Elementor context, Code Snippets and Super Admin tools to Abilities API
 * Tweak: Added ability to preview Elementor widget snippets in Custom Code screen
 

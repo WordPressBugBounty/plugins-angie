@@ -8,7 +8,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Mcp_Adapter_Authentication {
 
-	public static function check(): bool|\WP_Error {
+	/**
+	 * @return bool|\WP_Error
+	 */
+	public static function check() {
 		if ( ! is_user_logged_in() ) {
 			return new \WP_Error( 'authentication_required', 'User must be authenticated.' );
 		}
@@ -20,7 +23,10 @@ class Mcp_Adapter_Authentication {
 		return true;
 	}
 
-	public static function check_transport_permission( $_request = null ): bool|\WP_Error {
+	/**
+	 * @return bool|\WP_Error
+	 */
+	public static function check_transport_permission( $_request = null ) {
 		return self::check();
 	}
 }

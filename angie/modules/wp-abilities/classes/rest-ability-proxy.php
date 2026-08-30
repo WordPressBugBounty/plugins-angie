@@ -8,7 +8,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Rest_Ability_Proxy {
 
-	public static function execute( string $namespace, string $method, string $route, array $input = [] ): mixed {
+	/**
+	 * @return mixed
+	 */
+	public static function execute( string $namespace, string $method, string $route, array $input = [] ) {
 		foreach ( self::extract_path_param_names( $route ) as $param_name ) {
 			if ( ! array_key_exists( $param_name, $input ) ) {
 				return new \WP_Error(

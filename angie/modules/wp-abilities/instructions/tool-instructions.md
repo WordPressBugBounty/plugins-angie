@@ -1,4 +1,4 @@
-Angie WordPress MCP adapter for the /mcp/angie server.
+Angie WordPress MCP adapter for the site MCP server.
 
 ## Discover pattern (mandatory)
 

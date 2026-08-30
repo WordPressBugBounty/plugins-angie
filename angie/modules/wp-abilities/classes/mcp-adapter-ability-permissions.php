@@ -8,11 +8,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Mcp_Adapter_Ability_Permissions {
 
-	public static function check_read_permission(): bool|\WP_Error {
+	/**
+	 * @return bool|\WP_Error
+	 */
+	public static function check_read_permission() {
 		return Mcp_Adapter_Authentication::check();
 	}
 
-	public static function check_target_ability_permission( $input = [] ): bool|\WP_Error {
+	/**
+	 * @return bool|\WP_Error
+	 */
+	public static function check_target_ability_permission( $input = [] ) {
 		$auth_check = Mcp_Adapter_Authentication::check();
 		if ( is_wp_error( $auth_check ) ) {
 			return $auth_check;
@@ -22,7 +28,10 @@ class Mcp_Adapter_Ability_Permissions {
 		return self::validate_target_ability( (string) $ability_name );
 	}
 
-	public static function check_execute_permission( $input = [] ): bool|\WP_Error {
+	/**
+	 * @return bool|\WP_Error
+	 */
+	public static function check_execute_permission( $input = [] ) {
 		$auth_check = Mcp_Adapter_Authentication::check();
 		if ( is_wp_error( $auth_check ) ) {
 			return $auth_check;
@@ -44,7 +53,10 @@ class Mcp_Adapter_Ability_Permissions {
 		return $ability->check_permissions( $parameters );
 	}
 
-	public static function check_read_resource_permission( $input = [] ): bool|\WP_Error {
+	/**
+	 * @return bool|\WP_Error
+	 */
+	public static function check_read_resource_permission( $input = [] ) {
 		$auth_check = Mcp_Adapter_Authentication::check();
 		if ( is_wp_error( $auth_check ) ) {
 			return $auth_check;
@@ -63,7 +75,10 @@ class Mcp_Adapter_Ability_Permissions {
 		return $ability->check_permissions();
 	}
 
-	private static function validate_target_ability( string $ability_name ): bool|\WP_Error {
+	/**
+	 * @return bool|\WP_Error
+	 */
+	private static function validate_target_ability( string $ability_name ) {
 		if ( '' === $ability_name ) {
 			return new \WP_Error( 'missing_ability_name', 'Ability name is required.' );
 		}

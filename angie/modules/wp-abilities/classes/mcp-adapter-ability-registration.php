@@ -90,7 +90,7 @@ class Mcp_Adapter_Ability_Registration {
 			self::CATEGORY,
 			[
 				'label'       => esc_html__( 'Angie MCP', 'angie' ),
-				'description' => esc_html__( 'Angie-scoped MCP adapter tools for the /mcp/angie server.', 'angie' ),
+				'description' => esc_html__( 'Angie-scoped MCP adapter tools exposed on the site MCP server.', 'angie' ),
 			]
 		);
 	}
@@ -111,7 +111,7 @@ class Mcp_Adapter_Ability_Registration {
 			'angie/discover-abilities',
 			[
 				'label'               => esc_html__( 'Discover Angie abilities', 'angie' ),
-				'description'         => esc_html__( 'Discover tool abilities on this site (Angie and third-party), answer-format instructions, and tool usage instructions for the /mcp/angie server.', 'angie' ),
+				'description'         => esc_html__( 'Discover tool abilities on this site (Angie and third-party), answer-format instructions, and tool usage instructions for the site MCP server.', 'angie' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => [
 					'type'                 => 'object',
