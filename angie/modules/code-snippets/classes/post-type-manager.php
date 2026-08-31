@@ -2,6 +2,7 @@
 namespace Angie\Modules\CodeSnippets\Classes;
 
 use Angie\Modules\CodeSnippets\Module;
+use Angie\Modules\ConsentManager\Module as ConsentManager;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -45,7 +46,7 @@ class Post_Type_Manager {
 			'publicly_queryable' => true,
 			'exclude_from_search' => true,
 			'show_ui' => true,
-			'show_in_menu' => 'angie-app',
+			'show_in_menu' => ConsentManager::has_consent() ? 'angie-app' : false,
 			'show_in_admin_bar' => true,
 			'show_in_nav_menus' => false,
 			'show_in_rest' => false,

@@ -24,7 +24,10 @@ class Module extends Module_Base {
 	}
 
 	public function __construct() {
-		add_action( 'init', [ $this, 'bootstrap_shared_registry' ], 20 );
+		// Must not run on `init`: wp_get_abilities() lazily fires wp_abilities_api_init,
+		// and rest_api_init (where the adapter registers default meta-tools) now runs
+		// after `init`. Early ability registration empties mcp-adapter-default-server.
+		add_action( 'mcp_adapter_init', [ $this, 'bootstrap_shared_registry' ], 1 );
 		add_action( 'wp_abilities_api_init', [ $this, 'register_shared_registry_slugs' ], 110 );
 
 		if ( is_admin() ) {

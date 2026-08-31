@@ -2,6 +2,7 @@
 
 namespace Angie\Modules\Mcp\Components;
 
+use Angie\Modules\ConsentManager\Module as ConsentManager;
 use Angie\Modules\Mcp\Module as Mcp_Module;
 use Elementor\MCP\Composer\Admin\Page;
 
@@ -21,6 +22,10 @@ class Mcp_Page {
 	}
 
 	public function register_admin_menu(): void {
+		if ( ! ConsentManager::has_consent() ) {
+			return;
+		}
+
 		add_submenu_page(
 			'angie-app',
 			esc_html__( 'MCP', 'angie' ),

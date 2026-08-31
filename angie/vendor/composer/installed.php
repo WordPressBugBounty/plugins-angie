@@ -3,7 +3,7 @@
         'name' => 'elementor/angie',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => 'a0b2c479cf7134f3625c30680bee5e696d6c96bc',
+        'reference' => '73d745ce3b19ce80fa77c632a065a5322d146613',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -22,7 +22,7 @@
         'elementor/angie' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'a0b2c479cf7134f3625c30680bee5e696d6c96bc',
+            'reference' => '73d745ce3b19ce80fa77c632a065a5322d146613',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
