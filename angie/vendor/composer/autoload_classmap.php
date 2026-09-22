@@ -16,6 +16,7 @@ return array(
     'WP\\MCP\\Abilities\\DiscoverAbilitiesAbility' => $vendorDir . '/wordpress/mcp-adapter/includes/Abilities/DiscoverAbilitiesAbility.php',
     'WP\\MCP\\Abilities\\ExecuteAbilityAbility' => $vendorDir . '/wordpress/mcp-adapter/includes/Abilities/ExecuteAbilityAbility.php',
     'WP\\MCP\\Abilities\\GetAbilityInfoAbility' => $vendorDir . '/wordpress/mcp-adapter/includes/Abilities/GetAbilityInfoAbility.php',
+    'WP\\MCP\\Abilities\\McpAbilityExposure' => $vendorDir . '/wordpress/mcp-adapter/includes/Abilities/McpAbilityExposure.php',
     'WP\\MCP\\Abilities\\McpAbilityHelperTrait' => $vendorDir . '/wordpress/mcp-adapter/includes/Abilities/McpAbilityHelperTrait.php',
     'WP\\MCP\\Autoloader' => $vendorDir . '/wordpress/mcp-adapter/includes/Autoloader.php',
     'WP\\MCP\\Cli\\McpCommand' => $vendorDir . '/wordpress/mcp-adapter/includes/Cli/McpCommand.php',

@@ -3,6 +3,7 @@
 namespace Angie\Modules\Mcp;
 
 use Angie\Classes\Module_Base;
+use Angie\Modules\ConsentManager\Module as ConsentManager;
 use Angie\Modules\WpAbilities\Classes\Mcp_Adapter_Ability_Discovery;
 use Angie\Modules\WpAbilities\Classes\Mcp_Adapter_Ability_Registration;
 use Angie\Modules\WpAbilities\Classes\Wp_Abilities_Support;
@@ -29,6 +30,7 @@ class Module extends Module_Base {
 		// after `init`. Early ability registration empties mcp-adapter-default-server.
 		add_action( 'mcp_adapter_init', [ $this, 'bootstrap_shared_registry' ], 1 );
 		add_action( 'wp_abilities_api_init', [ $this, 'register_shared_registry_slugs' ], 110 );
+		add_filter( 'mcp_adapter_pre_tool_call', [ $this, 'require_consent_before_tool_call' ], 10, 1 );
 
 		if ( is_admin() ) {
 			$this->register_components( [
@@ -72,5 +74,33 @@ class Module extends Module_Base {
 		}
 
 		return array_values( array_unique( $tools ) );
+	}
+
+	/**
+	 * Block MCP tools/call when external-scripts consent is missing.
+	 * tools/list is unaffected (filter is call-only).
+	 *
+	 * @param array|\WP_Error $args Tool arguments (or prior WP_Error).
+	 * @return array|\WP_Error
+	 */
+	public function require_consent_before_tool_call( $args ) {
+		if ( is_wp_error( $args ) ) {
+			return $args;
+		}
+
+		if ( ConsentManager::has_consent() ) {
+			return $args;
+		}
+
+		$consent_url = admin_url( 'admin.php?page=angie-app' );
+
+		return new \WP_Error(
+			'angie_consent_required',
+			sprintf(
+				/* translators: %s: absolute URL to the Angie consent / welcome page */
+				esc_html__( 'Angie is installed but external-scripts consent has not been granted. MCP tools cannot run until you approve them here: %s', 'angie' ),
+				$consent_url
+			)
+		);
 	}
 }

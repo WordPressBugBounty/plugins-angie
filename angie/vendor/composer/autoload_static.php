@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit0db41567c3d8ae64e3cd1143df3b976c
+class ComposerStaticInitfd3427ad923c98a86cab2716a40991cb
 {
     public static $files = array (
         'a8fea8b4399cbd13660b53857806df1f' => __DIR__ . '/..' . '/elementor/elementor-mcp-composer/runner.php',
@@ -56,6 +56,7 @@ class ComposerStaticInit0db41567c3d8ae64e3cd1143df3b976c
         'WP\\MCP\\Abilities\\DiscoverAbilitiesAbility' => __DIR__ . '/..' . '/wordpress/mcp-adapter/includes/Abilities/DiscoverAbilitiesAbility.php',
         'WP\\MCP\\Abilities\\ExecuteAbilityAbility' => __DIR__ . '/..' . '/wordpress/mcp-adapter/includes/Abilities/ExecuteAbilityAbility.php',
         'WP\\MCP\\Abilities\\GetAbilityInfoAbility' => __DIR__ . '/..' . '/wordpress/mcp-adapter/includes/Abilities/GetAbilityInfoAbility.php',
+        'WP\\MCP\\Abilities\\McpAbilityExposure' => __DIR__ . '/..' . '/wordpress/mcp-adapter/includes/Abilities/McpAbilityExposure.php',
         'WP\\MCP\\Abilities\\McpAbilityHelperTrait' => __DIR__ . '/..' . '/wordpress/mcp-adapter/includes/Abilities/McpAbilityHelperTrait.php',
         'WP\\MCP\\Autoloader' => __DIR__ . '/..' . '/wordpress/mcp-adapter/includes/Autoloader.php',
         'WP\\MCP\\Cli\\McpCommand' => __DIR__ . '/..' . '/wordpress/mcp-adapter/includes/Cli/McpCommand.php',
@@ -308,9 +309,9 @@ class ComposerStaticInit0db41567c3d8ae64e3cd1143df3b976c
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit0db41567c3d8ae64e3cd1143df3b976c::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit0db41567c3d8ae64e3cd1143df3b976c::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit0db41567c3d8ae64e3cd1143df3b976c::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitfd3427ad923c98a86cab2716a40991cb::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitfd3427ad923c98a86cab2716a40991cb::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitfd3427ad923c98a86cab2716a40991cb::$classMap;
 
         }, null, ClassLoader::class);
     }
