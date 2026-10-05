@@ -23,6 +23,7 @@ class Abilities_Registrar extends Base_Abilities_Registrar {
 		'popup',
 		'form',
 		'visual-app',
+		'web-mcp',
 	];
 
 	protected static function get_category_meta(): array {

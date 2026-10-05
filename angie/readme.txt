@@ -4,7 +4,7 @@ Tags: ai, agent, elementor, assistant, mcp
 Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.17
+Stable tag: 1.1.18
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -194,6 +194,9 @@ Language should never be a barrier to bringing your WordPress ideas to life.
 
 
 == Changelog ==
+
+= 1.1.18 - 2026-10-05 =
+* New: Added capability to create and read WebMCP tools
 
 = 1.1.16 - 2026-08-31 =
 * Fix: Resolved an issue where the MCP Adapter default server returned no tools

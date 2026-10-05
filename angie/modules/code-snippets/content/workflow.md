@@ -23,7 +23,7 @@ Use high-quality Unsplash URLs (`https://images.unsplash.com/photo-...`) relevan
 If you omit `elementor_preview_settings`, the server applies a generic image fallback for preview — but explicit settings produce much better previews. Read `angie://code-snippet/guide/elementor-widget-requirements` for full details.
 
 ### Snippet Types
-`code-snippet` | `elementor-widget` | `gutenberg-block` | `popup` | `form` | `visual-app`
+`code-snippet` | `elementor-widget` | `gutenberg-block` | `popup` | `form` | `visual-app` | `web-mcp`
 
 ## Editing an Existing Snippet
 1. Get the `id` from `angie_list-snippets`

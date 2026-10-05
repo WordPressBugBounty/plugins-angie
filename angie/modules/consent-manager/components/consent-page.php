@@ -254,7 +254,7 @@ class Consent_Page {
 							</h4>
 						</div>
 						<p class="angie-subtitle">
-							<?php esc_html_e( 'Angie turns your ideas, screenshots, or URLs into working WordPress components.', 'angie' ); ?>
+							<?php esc_html_e( 'Angie turns your ideas, screenshots, or URLs into functional pages and components.', 'angie' ); ?>
 						</p>
 						<div class="angie-consent-section" data-testid="angie-consent-section">
 							<label class="angie-consent-checkbox" data-testid="angie-consent-checkbox">
@@ -487,7 +487,7 @@ class Consent_Page {
 			],
 			[
 				'title'       => esc_html__( 'Angie builds it', 'angie' ),
-				'description' => esc_html__( 'Get ready-to-use assets, from Elementor widgets to WordPress snippets.', 'angie' ),
+				'description' => esc_html__( 'Get ready-to-use pages, widgets, and WordPress snippets.', 'angie' ),
 			],
 			[
 				'title'       => esc_html__( 'Review before it goes live', 'angie' ),

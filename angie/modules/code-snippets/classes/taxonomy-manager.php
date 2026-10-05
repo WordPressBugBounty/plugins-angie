@@ -62,6 +62,7 @@ class Taxonomy_Manager {
 			'popup' => esc_html__( 'Popup', 'angie' ),
 			'form' => esc_html__( 'Form', 'angie' ),
 			'visual-app' => esc_html__( 'Visual App', 'angie' ),
+			'web-mcp' => esc_html__( 'Web MCP', 'angie' ),
 		];
 
 		foreach ( $default_terms as $slug => $name ) {
@@ -79,6 +80,7 @@ class Taxonomy_Manager {
 			'popup',
 			'form',
 			'visual-app',
+			'web-mcp',
 		];
 	}
 

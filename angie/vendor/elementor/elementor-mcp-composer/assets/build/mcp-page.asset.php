@@ -5,5 +5,5 @@ return [
 		'react-dom',
 		'wp-i18n',
 	],
-	'version' => '1789482590197',
+	'version' => '1790604373695',
 ];

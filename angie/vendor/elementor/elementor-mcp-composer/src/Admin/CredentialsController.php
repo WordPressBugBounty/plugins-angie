@@ -132,7 +132,7 @@ class CredentialsController extends RestController {
 					'username'            => $username,
 					'password'            => $chunked_pwd,
 					'serverUrl'           => \rest_url( 'elementor/mcp/' ),
-					'serverName'          => 'elementor-' . \sanitize_title( $site_name ),
+					'serverName'          => \sanitize_title( $site_name ) . '-elementor',
 					'encodedCredentials'  => $encoded_credentials,
 				],
 			],
