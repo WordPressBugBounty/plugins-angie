@@ -48,6 +48,10 @@ class Module extends Module_Base {
 	}
 
 	public function register_shared_registry_slugs(): void {
+		if ( ! Wp_Abilities_Support::should_expose_angie_on_site_mcp() ) {
+			return;
+		}
+
 		$shared = Shared_Registry::instance();
 		$shared->register_tools( $this->get_shared_tool_slugs() );
 		$shared->register_resources( Mcp_Adapter_Ability_Discovery::get_mcp_resource_ability_names() );

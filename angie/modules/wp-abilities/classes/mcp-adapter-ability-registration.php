@@ -96,7 +96,7 @@ class Mcp_Adapter_Ability_Registration {
 	}
 
 	public static function register_abilities(): void {
-		if ( ! Wp_Abilities_Support::is_mcp_adapter_supported() ) {
+		if ( ! Wp_Abilities_Support::is_mcp_adapter_supported() || ! Wp_Abilities_Support::should_expose_angie_on_site_mcp() ) {
 			return;
 		}
 

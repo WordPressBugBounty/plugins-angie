@@ -16,15 +16,36 @@ class Wp_Abilities_Support {
 		return class_exists( 'WP\MCP\Core\McpAdapter' ) && class_exists( 'WP\MCP\Transport\HttpTransport' );
 	}
 
+	/**
+	 * Site-wide Elementor MCP switch (same option as Elementor Core / elementor-mcp-composer).
+	 */
+	public static function is_elementor_mcp_enabled(): bool {
+		if ( class_exists( '\Elementor\MCP\Composer\Admin\McpSettingsController' ) ) {
+			return \Elementor\MCP\Composer\Admin\McpSettingsController::is_enabled();
+		}
+
+		$value = get_option( 'elementor_mcp_enabled', null );
+
+		if ( null === $value ) {
+			return false;
+		}
+
+		return (bool) $value;
+	}
+
+	public static function should_expose_angie_on_site_mcp(): bool {
+		return self::is_elementor_mcp_enabled();
+	}
+
 	public static function tool_mcp_meta(): array {
 		return [
-			'public' => true,
+			'public' => self::is_elementor_mcp_enabled(),
 		];
 	}
 
 	public static function resource_mcp_meta( string $mime_type = 'text/markdown' ): array {
 		return [
-			'public'   => true,
+			'public'   => self::is_elementor_mcp_enabled(),
 			'type'     => 'resource',
 			'mimeType' => $mime_type,
 		];
@@ -69,9 +90,11 @@ class Wp_Abilities_Support {
 			return;
 		}
 
-		add_action( 'wp_abilities_api_categories_init', [ Mcp_Adapter_Ability_Registration::class, 'register_category' ] );
-		add_action( 'wp_abilities_api_init', [ Mcp_Adapter_Ability_Registration::class, 'register_abilities' ], 100 );
-		add_action( 'mcp_adapter_init', [ Mcp_Server_Registrar::class, 'register_servers' ], 99 );
+		if ( self::should_expose_angie_on_site_mcp() ) {
+			add_action( 'wp_abilities_api_categories_init', [ Mcp_Adapter_Ability_Registration::class, 'register_category' ] );
+			add_action( 'wp_abilities_api_init', [ Mcp_Adapter_Ability_Registration::class, 'register_abilities' ], 100 );
+			add_action( 'mcp_adapter_init', [ Mcp_Server_Registrar::class, 'register_servers' ], 99 );
+		}
 
 		// Bootstrap ensures the legacy /mcp/angie route is registered; the advertised endpoint
 		// is the unified /elementor/mcp server, fed Angie's abilities via modules/mcp.

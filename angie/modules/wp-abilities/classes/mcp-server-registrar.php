@@ -32,7 +32,7 @@ class Mcp_Server_Registrar {
 			return;
 		}
 
-		if ( ! Wp_Abilities_Support::is_mcp_adapter_supported() ) {
+		if ( ! Wp_Abilities_Support::is_mcp_adapter_supported() || ! Wp_Abilities_Support::should_expose_angie_on_site_mcp() ) {
 			return;
 		}
 

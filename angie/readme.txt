@@ -4,7 +4,7 @@ Tags: ai, agent, elementor, assistant, mcp
 Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.18
+Stable tag: 1.1.19
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -194,6 +194,9 @@ Language should never be a barrier to bringing your WordPress ideas to life.
 
 
 == Changelog ==
+
+= 1.1.19 - 2026-10-06 =
+* Tweak: Improved compatibility between Angie and Elementor MCP settings
 
 = 1.1.18 - 2026-10-05 =
 * New: Added capability to create and read WebMCP tools
