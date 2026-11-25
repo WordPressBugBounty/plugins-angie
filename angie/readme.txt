@@ -4,7 +4,7 @@ Tags: ai, agent, elementor, assistant, mcp
 Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.19
+Stable tag: 1.1.20
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -72,6 +72,19 @@ Super Admin Mode is an opt-in capability that gives Angie read-write access to y
 - **Fix SEO gaps site-wide** - Populate missing meta descriptions, create redirect rules after category restructures, and standardize URL slugs across your full site in a single session.
 
 Run the full WordPress stack through the same Angie chat.
+
+== External services ==
+
+Angie relies on a service operated by Elementor Ltd. Nothing is loaded from it until you accept the Angie terms on the welcome screen.
+
+= Angie app script (Elementor CDN) =
+
+Angie's chat interface is a JavaScript file hosted on Elementor's content delivery network at editor-static-bucket.elementor.com. The plugin loads it so the Angie app can run in your WordPress admin and on your site's front end for users who have Angie access. When Angie previews a widget that has no image set, it also shows a placeholder image from the same host.
+
+* **When:** on admin and front-end pages for users who have Angie access, and only after consent has been given.
+* **Data sent:** the standard web request your browser makes to fetch a file, such as your IP address and browser details. The plugin does not add any site content or user data to this request.
+* **Terms of service:** [Angie Terms and Conditions](https://go.elementor.com/angie-terms)
+* **Privacy policy:** [Elementor Privacy Policy](https://go.elementor.com/ai-privacy-policy/)
 
 == Contributors & Developers ==
 

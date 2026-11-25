@@ -217,6 +217,20 @@ class Abilities_Registrar extends Base_Abilities_Registrar {
 				'args'        => [
 					'files' => self::get_snippet_files_arg_definition(),
 				],
+				// Run via loopback (like save) so already-loaded published snippets can't cause "Cannot redeclare".
+				'execute_callback' => static function ( $input ) {
+					$files = array_map( static function ( $file ) {
+						return [
+							'name'        => $file['name'] ?? '',
+							'content_b64' => base64_encode( $file['content'] ?? '' ),
+						];
+					}, (array) ( $input['files'] ?? [] ) );
+					$result = Snippet_Validator::validate_snippet_files( $files );
+					if ( is_wp_error( $result ) ) {
+						return new \WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 400 ] );
+					}
+					return [ 'valid' => true, 'message' => esc_html__( 'Snippet validation passed.', 'angie' ) ];
+				},
 			]
 		);
 

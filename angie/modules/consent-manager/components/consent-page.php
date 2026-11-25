@@ -53,13 +53,16 @@ class Consent_Page {
 			return;
 		}
 
-		// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- External Google Fonts resource, version not applicable
-		wp_enqueue_style(
-			'angie-google-fonts',
-			'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap',
-			[],
-			null
-		);
+		// Google Fonts is an external service: never load it on the welcome screen, only once consent is granted.
+		if ( ConsentManager::has_consent() ) {
+			// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- External Google Fonts resource, version not applicable
+			wp_enqueue_style(
+				'angie-google-fonts',
+				'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap',
+				[],
+				null
+			);
+		}
 
 		$consent = get_option( ConsentManager::CONSENT_OPTION_NAME, 'no' );
 		
@@ -181,6 +184,15 @@ class Consent_Page {
 
 		if ( 'reset' !== $action ) {
 			return;
+		}
+
+		// A nonce only proves intent, not authorization: require the same capability as the consent REST endpoint.
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die(
+				esc_html__( 'You do not have permission to reset Angie consent.', 'angie' ),
+				'',
+				[ 'response' => 403 ]
+			);
 		}
 
 		if ( ! $wpnonce || ! wp_verify_nonce( $wpnonce, 'angie_reset_consent' ) ) {

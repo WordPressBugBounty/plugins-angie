@@ -43,7 +43,7 @@ abstract class Abilities_Registrar {
 				'output_schema'       => [
 					'type' => 'object',
 				],
-				'execute_callback'    => static function ( $ability_input ) use ( $config, $rest_namespace ) {
+				'execute_callback'    => $config['execute_callback'] ?? static function ( $ability_input ) use ( $config, $rest_namespace ) {
 					$params = is_array( $ability_input ) ? $ability_input : [];
 					return Rest_Ability_Proxy::execute(
 						$rest_namespace,

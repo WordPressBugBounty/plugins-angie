@@ -16,6 +16,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 class WP_Options {
 
 	/**
+	 * Placeholder returned instead of the value of secret-looking options
+	 */
+	const REDACTED_VALUE = '[REDACTED]';
+
+	/**
 	 * REST API namespace
 	 *
 	 * @var string
@@ -122,6 +127,14 @@ class WP_Options {
 			'methods' => 'GET',
 			'callback' => [ $this, 'get_all_options' ],
 			'permission_callback' => [ $this, 'permissions_check' ],
+			'args' => [
+				'options' => [
+					'required' => false,
+					'type' => 'string',
+					'sanitize_callback' => 'sanitize_text_field',
+					'description' => 'Comma-separated allowlisted option names to return; omit to return the full allowlist.',
+				],
+			],
 		] );
 
 		\register_rest_route( $this->namespace, '/' . $this->rest_base, [
@@ -161,6 +174,17 @@ class WP_Options {
 	 */
 	protected function is_option_whitelisted( $option_name ) {
 		return in_array( $option_name, $this->whitelisted_options, true );
+	}
+
+	/**
+	 * Whether an option name looks like it holds a secret (API key, token, password...).
+	 * Defense in depth: applied even to allowlisted options.
+	 *
+	 * @param string $option_name
+	 * @return bool
+	 */
+	protected function is_secret_option( $option_name ) {
+		return 1 === preg_match( '/(key|token|secret|passw|credential|api|auth)/i', $option_name );
 	}
 
 	/**
@@ -212,15 +236,38 @@ class WP_Options {
 	 *
 	 * @return \WP_REST_Response|\WP_Error
 	 */
-	public function get_all_options() {
-		$safe_options = [];
-		$registered_options = \get_registered_settings();
+	public function get_all_options( $request = null ) {
+		$requested = $request instanceof \WP_REST_Request ? $request->get_param( 'options' ) : null;
 
-		$safe_options = array_merge( $this->whitelisted_options, array_keys( $registered_options ) );
+		if ( null !== $requested && '' !== $requested ) {
+			$requested = array_values( array_unique( array_map( 'trim', explode( ',', (string) $requested ) ) ) );
+			$denied = array_values( array_filter( $requested, fn( $name ) => ! $this->is_option_whitelisted( $name ) ) );
+
+			if ( ! empty( $denied ) ) {
+				return new \WP_Error(
+					'option_not_allowed',
+					sprintf(
+						// translators: %s is a comma separated list of option names.
+						esc_html__( 'Options are not allowed to be read: %s', 'angie' ),
+						esc_html( implode( ', ', $denied ) )
+					),
+					[ 'status' => 403 ]
+				);
+			}
+
+			$option_names = $requested;
+		} else {
+			// Only explicitly allowlisted options are readable. Registered settings are
+			// not exposed because they can hold secrets such as API keys.
+			$option_names = $this->whitelisted_options;
+		}
+
 		$return_options = [];
 
-		foreach ( $safe_options as $option_name ) {
-			$return_options[ $option_name ] = \get_option( $option_name );
+		foreach ( $option_names as $option_name ) {
+			$return_options[ $option_name ] = $this->is_secret_option( $option_name )
+				? self::REDACTED_VALUE
+				: \get_option( $option_name );
 		}
 
 		$response = [
@@ -312,9 +359,13 @@ class WP_Options {
 	public function get_site_health() {
 		// Load required admin files.
 		require_once ABSPATH . 'wp-admin/includes/update.php';
-		require_once ABSPATH . 'wp-admin/includes/misc.php';
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+
+		// WP_Site_Health::get_test_php_version() calls wp_check_php_version(), which lives in misc.php and is not loaded on REST requests.
+		if ( ! function_exists( 'wp_check_php_version' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/misc.php';
+		}
 
 		if ( ! class_exists( 'WP_Site_Health' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/class-wp-site-health.php';

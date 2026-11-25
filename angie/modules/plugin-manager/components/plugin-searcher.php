@@ -95,7 +95,6 @@ class Plugin_Searcher extends Base {
 		$page = $request->get_param( 'page' );
 		$per_page = $request->get_param( 'per_page' );
 
-		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
 
 		$args = [
@@ -143,7 +142,6 @@ class Plugin_Searcher extends Base {
 	public function get_plugin_info( $request ) {
 		$slug = $request->get_param( 'slug' );
 
-		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
 
 		$api = \plugins_api( 'plugin_information', [ 'slug' => $slug ] );

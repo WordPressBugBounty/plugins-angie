@@ -26,7 +26,7 @@ class Mcp_Page {
 			return;
 		}
 
-		add_submenu_page(
+		$hook_suffix = add_submenu_page(
 			'angie-app',
 			esc_html__( 'MCP', 'angie' ),
 			esc_html__( 'MCP', 'angie' ),
@@ -35,6 +35,14 @@ class Mcp_Page {
 			[ $this, 'render' ],
 			2
 		);
+
+		if ( is_string( $hook_suffix ) ) {
+			add_action( "load-{$hook_suffix}", [ $this, 'maybe_redirect_to_core_mcp_admin' ] );
+		}
+	}
+
+	public function maybe_redirect_to_core_mcp_admin(): void {
+		Core_Admin_Redirect::maybe_redirect();
 	}
 
 	public function render(): void {

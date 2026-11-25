@@ -51,13 +51,16 @@ class Agents_Page {
 		$agents_css_url = plugins_url( 'modules/angie-agents/assets/agents-page.css', $plugin_root_file );
 		$agents_js_url = plugins_url( 'modules/angie-agents/assets/agents-page.js', $plugin_root_file );
 
-		// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- External Google Fonts resource, version not applicable
-		wp_enqueue_style(
-			'angie-google-fonts',
-			'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap',
-			[],
-			null
-		);
+		// Google Fonts is an external service: load it only after the user has given consent.
+		if ( ConsentManager::has_consent() ) {
+			// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- External Google Fonts resource, version not applicable
+			wp_enqueue_style(
+				'angie-google-fonts',
+				'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap',
+				[],
+				null
+			);
+		}
 
 		wp_enqueue_style(
 			'angie-agents-page',

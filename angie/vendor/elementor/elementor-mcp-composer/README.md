@@ -4,6 +4,8 @@ Reusable Composer library that coordinates a **single unified Elementor MCP serv
 
 The package follows the same multi-plugin version arbitration pattern as [`elementor/wp-one-package`](https://github.com/elementor/wp-one-package): when bundled by more than one plugin, the highest version wins.
 
+Agents adding a host plugin, or changing this package's public API, follow [.cursor/skills/host-mcp-composer/SKILL.md](.cursor/skills/host-mcp-composer/SKILL.md). The same steps are on Confluence: [elementor-mcp-composer: add a host plugin](https://elementor.atlassian.net/wiki/spaces/RDDEP/pages/3124199425). `.cursor/rules/keep-mcp-composer-docs-current.mdc` requires those three to stay in sync when the host contract changes.
+
 ## Requirements
 
 - PHP 7.4+
@@ -47,7 +49,7 @@ Versions picks highest registered version on plugins_loaded (-15)
 Loader::init() defines constants and boots Server_Bootstrap
         │
         ▼
-Server_Bootstrap creates one MCP server from Registry slugs
+Server_Bootstrap registers registry slugs on the MCP Adapter default server and the legacy Elementor MCP server
 ```
 
 Each host plugin is responsible for:
@@ -55,6 +57,10 @@ Each host plugin is responsible for:
 1. **Registering abilities** via `wp_register_ability()` (the actual tool/resource implementations).
 2. **Contributing slugs** to the shared `Registry` so the unified server exposes them.
 3. **Mounting the admin page** (optional) by delegating to `Admin\Page` from the host's menu system.
+
+### While the Elementor abilities are disabled
+
+When the `elementor_mcp_enabled` setting is off, the registry slugs are not exposed. The default server lists a single tool, `elementor/enable-elementor-abilities`, instead. It has one required boolean input, `consent`, which the model must set to `true` only after asking the user and getting their explicit agreement in chat. For an administrator (`manage_options`) and a strict boolean `true`, the tool enables the abilities through the same code as the settings route (`McpSettingsController::set_enabled()`) and tells the model to reload its tool list. Any other value (missing, `false`, a string, a number) or a user without the capability changes nothing. The tool is only registered while the setting is off, is not exposed through the Abilities REST API or the adapter's discover/execute tools, is not registered on the legacy `elementor-mcp-server`, and is gone on the next request after enabling.
 
 ---
 
@@ -77,6 +83,51 @@ wp_register_ability(
 ```
 
 Do this on the `wp_abilities_api_init` action (or your plugin's equivalent bootstrap hook).
+
+#### Or extend `Abstract_Ability`
+
+The package ships the base class Elementor abilities use. Subclass it and call `register()`:
+
+```php
+use Elementor\MCP\Composer\Mcp\Abstract_Ability;
+use Elementor\MCP\Composer\Mcp\Ability_Definition;
+
+class My_Tool extends Abstract_Ability {
+
+    protected function get_ability_id(): string {
+        return 'elementor/my-tool';
+    }
+
+    protected function get_definition(): Ability_Definition {
+        return new Ability_Definition(
+            'My Tool',
+            'Does something useful.',
+            'elementor',
+            [ 'type' => 'object' ],                   // output schema
+            [ 'mutates_page' => true ],               // meta
+            fn() => current_user_can( 'edit_posts' ), // permission callback
+            [ 'type' => 'object', 'properties' => [ 'post_id' => [ 'type' => 'integer' ] ] ]
+        );
+    }
+
+    public function execute( $input = [] ) {
+        return [ 'status' => 'ok' ];
+    }
+}
+
+add_action( 'wp_abilities_api_init', fn() => ( new My_Tool() )->register() );
+```
+
+`register()` wires `execute_guarded()` as the execute callback, sets `meta.mcp.public` from the `elementor_mcp_enabled` setting and sets `meta.show_in_rest`. `execute_guarded()` runs these hooks, so host plugins add their own behavior without changing the base class:
+
+| Hook | Type | Arguments |
+| --- | --- | --- |
+| `elementor/mcp/ability/is_available` | filter | `true\|WP_Error`, `$id`, `$ability` |
+| `elementor/mcp/pre_execute_guard` | filter | `null\|WP_Error`, `$input` (page-mutating tools only) |
+| `elementor/mcp/ability/before_execute` | action | `$ability`, `$input` |
+| `elementor/mcp/ability/after_execute` | action | `$ability`, `$input`, `$result`, `$context` |
+
+`$context` holds `is_mutating`, `is_failed`, `is_dry_run`, `post_id` and `record_capability` (false for errors and `dry_run`). Override `supports_dry_run()` to accept `dry_run: true`; otherwise a dry run returns a `dry_run_unsupported` error. A `description_notice` in an `is_available` error's data is appended to the ability description.
 
 ### Step 2 — Contribute the slug to the shared registry
 
@@ -106,7 +157,7 @@ $registry->register_prompts( [
 ] );
 ```
 
-Register slugs **early** — before `mcp_adapter_init` fires — so `Server_Bootstrap` can pick them up when creating the server.
+Register slugs on `mcp_adapter_init` at a priority **lower than 10** (Core uses 5, Angie 1), so `Server_Bootstrap::register_server` (default priority 10) picks them up when creating the server.
 
 ### Step 3 — Extend via filters (optional)
 
@@ -208,7 +259,7 @@ See [`elementor/modules/mcp/admin-menu-items/editor-one-mcp-menu.php`](https://g
 The rendered page shows:
 
 - **Registered abilities** — JSON snapshot of tools, resources, and prompts on the unified server.
-- **MCP client config** — ready-to-paste Cursor / Claude Desktop settings using `@automattic/mcp-wordpress-remote`.
+- **MCP client config** — ready-to-paste Cursor / Claude Desktop JSON pointing at `/wp-json/mcp/mcp-adapter-default-server` (WordPress MCP Adapter default server).
 
 ---
 

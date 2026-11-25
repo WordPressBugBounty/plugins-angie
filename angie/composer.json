@@ -1,0 +1,38 @@
+{
+    "name": "elementor/angie",
+	"require-dev": {
+		"yoast/phpunit-polyfills": "^1.0",
+		"wp-phpunit/wp-phpunit": "^6",
+		"wp-coding-standards/wpcs": "^3.1",
+		"squizlabs/php_codesniffer": "^3.7",
+		"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+		"phpcompatibility/php-compatibility": "^9.3"
+	},
+	"scripts": {
+		"lint": "vendor/bin/phpcs --extensions=php --standard=./ruleset.xml .",
+		"lint:fix": "vendor/bin/phpcbf --extensions=php --standard=./ruleset.xml .",
+		"lint:compat": "vendor/bin/phpcs --standard=PHPCompatibility --runtime-set testVersion 7.4- --extensions=php --ignore=*/vendor/*,*/tests/*,*/node_modules/*,*/build/* .",
+		"test": "npx @wordpress/env start && npx @wordpress/env run tests-wordpress /var/www/html/wp-content/plugins/angie-plugin/vendor/bin/phpunit --configuration /var/www/html/wp-content/plugins/angie-plugin/phpunit.xml"
+	},
+    "require": {
+        "automattic/jetpack-autoloader": "^6",
+        "elementor/elementor-mcp-composer": "^1.0.23",
+        "elementor/wp-notifications-package": "^1.2",
+        "wordpress/mcp-adapter": "^0.7.0"
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://composer.elementor.com/"
+        }
+    ],
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "automattic/jetpack-autoloader": true
+        },
+        "platform": {
+            "php": "8.1.33"
+        }
+    }
+}

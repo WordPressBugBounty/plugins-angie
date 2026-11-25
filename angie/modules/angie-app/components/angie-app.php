@@ -84,13 +84,16 @@ class Angie_App {
 			return;
 		}
 
-		// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- External Google Fonts resource, version not applicable
-		wp_enqueue_style(
-			'angie-google-fonts',
-			'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap',
-			[],
-			null
-		);
+		// Google Fonts is an external service: load it only after the user has given consent.
+		if ( ConsentManager::has_consent() ) {
+			// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- External Google Fonts resource, version not applicable
+			wp_enqueue_style(
+				'angie-google-fonts',
+				'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap',
+				[],
+				null
+			);
+		}
 
 		// Exclude Site Planner Connect page from loading Angie app script.
 		$excluded_pages = [
